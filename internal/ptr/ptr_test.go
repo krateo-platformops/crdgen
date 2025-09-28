@@ -3,7 +3,7 @@ package ptr_test
 import (
 	"testing"
 
-	"github.com/krateoplatformops/crdgen/internal/ptr"
+	"github.com/krateoplatformops/crdgen/v2/internal/ptr"
 )
 
 func TestRef(t *testing.T) {
