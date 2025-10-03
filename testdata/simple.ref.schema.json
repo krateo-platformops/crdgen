@@ -1,0 +1,16 @@
+{
+  "$id": "https://example.com/test.schema.json",
+  "$defs": {
+    "MyType": {
+      "type": ["object", "null"],
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "myField": { "$ref": "#/$defs/MyType" }
+  }
+}

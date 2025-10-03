@@ -1,0 +1,168 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "fromRepo": {
+            "type": "object",
+            "properties": {
+                "krateoIgnorePath": {
+                    "type": "string",
+                    "default": "/"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string",
+                    "default": "/"
+                },
+                "branch": {
+                    "type": "string"
+                },
+                "secretRef": {
+                    "$ref": "#/$defs/SecretKeySelector"
+                },
+                "usernameRef": {
+                    "$ref": "#/$defs/SecretKeySelector"
+                },
+                "authMethod": {
+                    "type": "string",
+                    "enum": [
+                        "generic",
+                        "bearer",
+                        "cookiefile"
+                    ],
+                    "default": "generic"
+                },
+                "cloneFromBranch": {
+                    "type": ["string", "null"]
+                }
+            },
+            "required": [
+                "url",
+                "branch"
+            ]
+        },
+        "toRepo": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string",
+                    "default": "/"
+                },
+                "branch": {
+                    "type": "string"
+                },
+                "secretRef": {
+                    "$ref": "#/$defs/SecretKeySelector"
+                },
+                "usernameRef": {
+                    "$ref": "#/$defs/SecretKeySelector"
+                },
+                "authMethod": {
+                    "type": "string",
+                    "enum": [
+                        "generic",
+                        "bearer",
+                        "cookiefile"
+                    ],
+                    "default": "generic"
+                },
+                "cloneFromBranch": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "url",
+                "branch"
+            ]
+        },
+        "configMapKeyRef": {
+            "$ref": "#/$defs/ConfigMapKeySelector"
+        },
+        "insecure": {
+            "type": ["boolean", "null"]
+        },
+        "unsupportedCapabilities": {
+            "type": ["boolean", "null"]
+        },
+        "enableUpdate": {
+            "type": ["boolean", "null"]
+        },
+        "override": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "required": [
+        "fromRepo",
+        "toRepo"
+    ],
+    "$defs": {
+        "Reference": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "namespace"
+            ]
+        },
+        "EnvSelector": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "SecretKeySelector": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/Reference"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "key"
+                    ]
+                }
+            ]
+        },
+        "ConfigMapKeySelector": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/Reference"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "key"
+                    ]
+                }
+            ]
+        }
+    }
+}

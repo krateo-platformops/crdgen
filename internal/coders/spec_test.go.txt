@@ -1,0 +1,37 @@
+package coders
+
+import (
+	"bytes"
+	"go/format"
+	"io"
+	"os"
+	"testing"
+)
+
+func TestCodeForSpec(t *testing.T) {
+	ss, err := os.ReadFile("../../testdata/simple.ref.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res := Resource{
+		Group:      "krateo.io",
+		Version:    "v1alpha1",
+		Kind:       "Provalo",
+		Categories: []string{"krateo"},
+		SpecSchema: ss,
+		Managed:    true,
+	}
+
+	dat, err := CodeForSpec(&res)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dat, err = format.Source(dat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	io.Copy(os.Stdout, bytes.NewReader(dat))
+}
