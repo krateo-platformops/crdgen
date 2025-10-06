@@ -4,14 +4,14 @@ import (
 	"io"
 )
 
-type istruct struct {
+type IStruct struct {
 	name  string
 	items *group
 }
 
 // Struct will insert a new struct.
-func Struct(name string) *istruct {
-	return &istruct{
+func Struct(name string) *IStruct {
+	return &IStruct{
 		name: name,
 		// We will insert new line before closing the struct to avoid being affect
 		// by line comments.
@@ -19,24 +19,24 @@ func Struct(name string) *istruct {
 	}
 }
 
-func (i *istruct) render(w io.Writer) {
+func (i *IStruct) render(w io.Writer) {
 	writeStringF(w, "type %s struct ", i.name)
 	i.items.render(w)
 }
 
 // AddLine will insert an empty line.
-func (i *istruct) AddLine() *istruct {
+func (i *IStruct) AddLine() *IStruct {
 	i.items.append(Line())
 	return i
 }
 
 // AddLineComment will insert a new line comment.
-func (i *istruct) AddLineComment(content string, args ...any) *istruct {
+func (i *IStruct) AddLineComment(content string, args ...any) *IStruct {
 	i.items.append(LineComment(content, args...))
 	return i
 }
 
-func (i *istruct) AddField(name, typ any, tags map[string]string) *istruct {
+func (i *IStruct) AddField(name, typ any, tags map[string]string) *IStruct {
 	i.items.append(field(name, typ, " ", tags))
 	return i
 }

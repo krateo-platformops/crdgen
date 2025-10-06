@@ -149,7 +149,7 @@ func (g *group) NewFunction(name string) *ifunction {
 	return f
 }
 
-func (g *group) NewStruct(name string) *istruct {
+func (g *group) NewStruct(name string) *IStruct {
 	i := Struct(name)
 	g.append(i)
 	return i

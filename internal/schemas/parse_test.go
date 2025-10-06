@@ -1,10 +1,9 @@
 package schemas
 
 import (
+	"fmt"
 	"strings"
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func TestParse(t *testing.T) {
@@ -33,5 +32,5 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	spew.Dump(sch)
+	fmt.Printf("%+v\n", sch)
 }
