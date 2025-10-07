@@ -20,7 +20,7 @@ func TestGenTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res := Resource{
+	res := Options{
 		Group:        "git.krateo.io",
 		Version:      "v1alpha1",
 		Kind:         "Repo",

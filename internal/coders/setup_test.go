@@ -10,7 +10,7 @@ import (
 func TestGenSetup(t *testing.T) {
 	os.Setenv("FORMAT", "1")
 
-	res := Resource{
+	res := Options{
 		Group:   "git.krateo.io",
 		Version: "v1alpha1",
 		Kind:    "Repo",

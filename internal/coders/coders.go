@@ -13,7 +13,7 @@ import (
 	"github.com/krateoplatformops/plumbing/env"
 )
 
-type Resource struct {
+type Options struct {
 	Group        string
 	Version      string
 	Kind         string
@@ -36,7 +36,7 @@ func SourceDir(rootdir, kind string) string {
 	return filepath.Join(parts...)
 }
 
-func GenAll(rootdir string, res *Resource) error {
+func GenAll(rootdir string, res *Options) error {
 	mod := ModuleName(res.Kind)
 
 	err := WriteTypesToFile(rootdir, res)
@@ -68,7 +68,7 @@ func GenAll(rootdir string, res *Resource) error {
 	return err
 }
 
-func WriteSetupToFile(rootdir string, opts *Resource) error {
+func WriteSetupToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
 	parts := []string{rootdir}
@@ -98,7 +98,7 @@ func WriteSetupToFile(rootdir string, opts *Resource) error {
 	return err
 }
 
-func WriteGenerateToFile(rootdir string, opts *Resource) error {
+func WriteGenerateToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
 	parts := []string{rootdir}
@@ -128,7 +128,7 @@ func WriteGenerateToFile(rootdir string, opts *Resource) error {
 	return err
 }
 
-func WriteGroupVersionInfoToFile(rootdir string, opts *Resource) error {
+func WriteGroupVersionInfoToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
 	parts := []string{rootdir}
@@ -158,7 +158,7 @@ func WriteGroupVersionInfoToFile(rootdir string, opts *Resource) error {
 	return err
 }
 
-func WriteTypesToFile(rootdir string, opts *Resource) error {
+func WriteTypesToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
 	parts := []string{rootdir}
@@ -188,7 +188,7 @@ func WriteTypesToFile(rootdir string, opts *Resource) error {
 	return err
 }
 
-func GenTypes(opts *Resource) (dat []byte, err error) {
+func GenTypes(opts *Options) (dat []byte, err error) {
 	co := newTypesCoder()
 
 	err = co.parseSchemaForSpec(opts.SpecSchema)
@@ -224,7 +224,7 @@ func GenTypes(opts *Resource) (dat []byte, err error) {
 	return co.bytes(env.True("FORMAT"))
 }
 
-func GenGroupVersionInfo(opts *Resource) (dat []byte, err error) {
+func GenGroupVersionInfo(opts *Options) (dat []byte, err error) {
 	co := newGroupVersionInfoCoder()
 
 	co.addImports(opts.Group, opts.Version)
@@ -237,7 +237,7 @@ func GenGroupVersionInfo(opts *Resource) (dat []byte, err error) {
 	return co.bytes(env.True("FORMAT"))
 }
 
-func GenGenerate(opts *Resource) (dat []byte, err error) {
+func GenGenerate(opts *Options) (dat []byte, err error) {
 	co := newGenerateCoder()
 
 	co.generate()
@@ -245,7 +245,7 @@ func GenGenerate(opts *Resource) (dat []byte, err error) {
 	return co.bytes(env.True("FORMAT"))
 }
 
-func GenSetup(opts *Resource) (dat []byte, err error) {
+func GenSetup(opts *Options) (dat []byte, err error) {
 	co := newSetupCoder()
 
 	co.addImports(opts.Kind, opts.Version)

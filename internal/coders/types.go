@@ -286,7 +286,7 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, cb func(*gg.
 			st.AddLineComment("+kubebuilder:title:%s", prop.Title)
 		}
 		if prop.Default != nil {
-			st.AddLineComment("+kubebuilder:default=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
+			st.AddLineComment("+kubebuilder:default:=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
 		}
 
 		if prop.Minimum != nil {

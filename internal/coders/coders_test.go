@@ -24,7 +24,7 @@ func TestGenAll(t *testing.T) {
 	// 	t.Fatal(err)
 	// }
 
-	res := Resource{
+	res := Options{
 		Group:        "git.krateo.io",
 		Version:      "v1alpha1",
 		Kind:         "Repo",
@@ -40,7 +40,7 @@ func TestGenAll(t *testing.T) {
 	}
 
 	srcdir := SourceDir(rootdir, res.Kind)
-	//defer os.RemoveAll(srcdir)
+	defer os.RemoveAll(srcdir)
 
 	err = tools.Tidy(srcdir)
 	if err != nil {
