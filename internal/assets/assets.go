@@ -1,7 +1,9 @@
 package assets
 
 import (
+	"bytes"
 	"embed"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -11,6 +13,7 @@ import (
 )
 
 //go:embed files/*.tpl
+//go:embed files/*.txt
 var tmplFS embed.FS
 
 func Render(w io.Writer, name string, data any) error {
@@ -25,11 +28,60 @@ func Render(w io.Writer, name string, data any) error {
 	return tmpl.ExecuteTemplate(w, name, data)
 }
 
-func Export(target string, dat []byte) error {
-	err := os.MkdirAll(filepath.Dir(target), 0755)
+func RenderToFile(rootdir, mod string) error {
+	parts := []string{rootdir}
+	parts = append(parts, strings.Split(mod, "/")...)
+
+	workdir := filepath.Join(parts...)
+	err := os.MkdirAll(workdir, os.ModePerm)
+	if err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return err
+		}
+	}
+
+	buf := bytes.Buffer{}
+	err = Render(&buf, "go.mod", map[string]string{"module": mod})
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(target, dat, 0666)
+	out, err := os.Create(filepath.Join(workdir, "go.mod"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, &buf)
+	return err
+}
+
+func ExportBoilerPlate(rootdir, mod string) error {
+	parts := []string{rootdir}
+	parts = append(parts, strings.Split(mod, "/")...)
+	parts = append(parts, "hack")
+
+	workdir := filepath.Join(parts...)
+	err := os.MkdirAll(workdir, os.ModePerm)
+	if err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return err
+		}
+	}
+
+	in, err := tmplFS.Open("files/boilerplate.go.txt")
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(filepath.Join(workdir, "boilerplate.go.txt"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+
+	return err
 }

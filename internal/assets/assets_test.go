@@ -5,8 +5,8 @@ package assets_test
 
 import (
 	"bytes"
+	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/krateoplatformops/crdgen/v2/internal/assets"
@@ -34,10 +34,5 @@ func TestExport(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	targetDir := "/private/var/folders/qb/ckvcz6s10b590xt0b808977h0000gn/T/github.com/krateoplatformops/form1"
-	target := filepath.Join(targetDir, "go.mod")
-	err = assets.Export(target, buf.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
+	fmt.Println(buf.String())
 }

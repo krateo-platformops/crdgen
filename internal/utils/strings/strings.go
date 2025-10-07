@@ -3,6 +3,7 @@ package strings
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 )
 
@@ -51,8 +52,59 @@ func StrVal(v any) string {
 		return v.Error()
 	case fmt.Stringer:
 		return v.String()
+	case []any:
+		parts := make([]string, len(v))
+		for i, e := range v {
+			parts[i] = StrVal(e)
+		}
+		return fmt.Sprintf("{%s}", strings.Join(parts, ","))
 	default:
 		return fmt.Sprintf("%v", v)
+	}
+}
+
+func DefaultValForKubebuilder(def any) string {
+	switch v := def.(type) {
+	case []any:
+		strs := make([]string, len(v))
+		for i, item := range v {
+			strs[i] = fmt.Sprintf("%v", item)
+		}
+		return fmt.Sprintf("{%s}", `"`+strings.Join(strs, `","`)+`"`)
+	case []string:
+		return fmt.Sprintf("{%s}", `"`+strings.Join(v, `","`)+`"`)
+	case map[string]any:
+		// Sort by keys for a stable output
+		keys := make([]string, 0, len(v))
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		parts := make([]string, len(keys))
+		for i, k := range keys {
+			parts[i] = fmt.Sprintf("%s: %v", k, formatMapValue(v[k]))
+		}
+		return fmt.Sprintf("{%s}", strings.Join(parts, ", "))
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+func formatMapValue(v any) string {
+	switch val := v.(type) {
+	case string:
+		return fmt.Sprintf("%q", val)
+	case []any:
+		strs := make([]string, len(val))
+		for i, item := range val {
+			strs[i] = fmt.Sprintf("%v", item)
+		}
+		return fmt.Sprintf("{%s}", strings.Join(strs, ","))
+	case map[string]any:
+		return DefaultValForKubebuilder(val)
+	default:
+		return fmt.Sprintf("%v", val)
 	}
 }
 

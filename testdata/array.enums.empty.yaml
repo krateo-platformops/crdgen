@@ -1,0 +1,5 @@
+apiVersion: git.krateo.io/v1alpha1
+kind: Repo
+metadata:
+  name: test
+spec: {}

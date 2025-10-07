@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/krateoplatformops/crdgen/v2/internal/assets"
 	"github.com/krateoplatformops/plumbing/env"
 )
 
@@ -26,13 +27,104 @@ func ModuleName(kind string) string {
 	return fmt.Sprintf("github.com/krateoplatformops/%s-crdgen", strings.ToLower(kind))
 }
 
+func SourceDir(rootdir, kind string) string {
+	mod := ModuleName(kind)
+
+	parts := []string{rootdir}
+	parts = append(parts, strings.Split(mod, "/")...)
+
+	return filepath.Join(parts...)
+}
+
 func GenAll(rootdir string, res *Resource) error {
+	mod := ModuleName(res.Kind)
+
 	err := WriteTypesToFile(rootdir, res)
 	if err != nil {
 		return err
 	}
 
 	err = WriteGroupVersionInfoToFile(rootdir, res)
+	if err != nil {
+		return err
+	}
+
+	err = WriteGenerateToFile(rootdir, res)
+	if err != nil {
+		return err
+	}
+
+	err = WriteSetupToFile(rootdir, res)
+	if err != nil {
+		return err
+	}
+
+	err = assets.RenderToFile(rootdir, mod)
+	if err != nil {
+		return err
+	}
+
+	err = assets.ExportBoilerPlate(rootdir, mod)
+	return err
+}
+
+func WriteSetupToFile(rootdir string, opts *Resource) error {
+	mod := ModuleName(opts.Kind)
+
+	parts := []string{rootdir}
+	parts = append(parts, strings.Split(mod, "/")...)
+	parts = append(parts, "apis")
+
+	workdir := filepath.Join(parts...)
+	err := os.MkdirAll(workdir, os.ModePerm)
+	if err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return err
+		}
+	}
+
+	bin, err := GenSetup(opts)
+	if err != nil {
+		return err
+	}
+
+	out, err := os.Create(filepath.Join(workdir, "apis.go"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, bytes.NewReader(bin))
+	return err
+}
+
+func WriteGenerateToFile(rootdir string, opts *Resource) error {
+	mod := ModuleName(opts.Kind)
+
+	parts := []string{rootdir}
+	parts = append(parts, strings.Split(mod, "/")...)
+	parts = append(parts, "apis")
+
+	workdir := filepath.Join(parts...)
+	err := os.MkdirAll(workdir, os.ModePerm)
+	if err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return err
+		}
+	}
+
+	bin, err := GenGenerate(opts)
+	if err != nil {
+		return err
+	}
+
+	out, err := os.Create(filepath.Join(workdir, "generate.go"))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, bytes.NewReader(bin))
 	return err
 }
 
@@ -41,7 +133,7 @@ func WriteGroupVersionInfoToFile(rootdir string, opts *Resource) error {
 
 	parts := []string{rootdir}
 	parts = append(parts, strings.Split(mod, "/")...)
-	parts = append(parts, "apis", opts.Version)
+	parts = append(parts, "apis", strings.ToLower(opts.Kind), opts.Version)
 
 	workdir := filepath.Join(parts...)
 	err := os.MkdirAll(workdir, os.ModePerm)
@@ -71,7 +163,7 @@ func WriteTypesToFile(rootdir string, opts *Resource) error {
 
 	parts := []string{rootdir}
 	parts = append(parts, strings.Split(mod, "/")...)
-	parts = append(parts, "apis", opts.Version)
+	parts = append(parts, "apis", strings.ToLower(opts.Kind), opts.Version)
 
 	workdir := filepath.Join(parts...)
 	err := os.MkdirAll(workdir, os.ModePerm)
@@ -127,7 +219,7 @@ func GenTypes(opts *Resource) (dat []byte, err error) {
 	}
 
 	co.buildEntryItemStructs(opts.Kind, opts.Categories, opts.Managed)
-	co.buildEntryListStructs(opts.Kind, opts.Categories, opts.Managed)
+	co.buildEntryListStructs(opts.Kind, opts.Managed)
 
 	return co.bytes(env.True("FORMAT"))
 }
@@ -138,9 +230,27 @@ func GenGroupVersionInfo(opts *Resource) (dat []byte, err error) {
 	co.addImports(opts.Group, opts.Version)
 	co.addConst(opts.Group, opts.Version)
 
-	co.addVars(opts.Kind, opts.Group, opts.Version)
+	co.addVars(opts.Kind)
 
 	co.initFunc(opts.Kind)
+
+	return co.bytes(env.True("FORMAT"))
+}
+
+func GenGenerate(opts *Resource) (dat []byte, err error) {
+	co := newGenerateCoder()
+
+	co.generate()
+
+	return co.bytes(env.True("FORMAT"))
+}
+
+func GenSetup(opts *Resource) (dat []byte, err error) {
+	co := newSetupCoder()
+
+	co.addImports(opts.Kind, opts.Version)
+	co.addVar()
+	co.addFuncs()
 
 	return co.bytes(env.True("FORMAT"))
 }

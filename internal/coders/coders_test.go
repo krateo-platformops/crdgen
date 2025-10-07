@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/krateoplatformops/crdgen/v2/internal/tools"
 )
 
 func TestGenAll(t *testing.T) {
@@ -11,15 +13,16 @@ func TestGenAll(t *testing.T) {
 
 	rootdir := os.TempDir()
 
-	specSchemaBytes, err := os.ReadFile("../../testdata/git.spec.schema.json")
+	specSchemaBytes, err := os.ReadFile("../../testdata/array.enums.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	statusSchemaBytes, err := os.ReadFile("../../testdata/git.status.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
+	var statusSchemaBytes []byte
+	// statusSchemaBytes, err = os.ReadFile("../../testdata/git.status.schema.json")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
 	res := Resource{
 		Group:        "git.krateo.io",
@@ -28,7 +31,7 @@ func TestGenAll(t *testing.T) {
 		Categories:   []string{"krateo", "git", "repo"},
 		SpecSchema:   specSchemaBytes,
 		StatusSchema: statusSchemaBytes,
-		Managed:      true,
+		Managed:      false,
 	}
 
 	err = GenAll(rootdir, &res)
@@ -36,5 +39,17 @@ func TestGenAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Println(rootdir)
+	srcdir := SourceDir(rootdir, res.Kind)
+	//defer os.RemoveAll(srcdir)
+
+	err = tools.Tidy(srcdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	yml, err := tools.GenerateCRDs(srcdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(yml))
 }

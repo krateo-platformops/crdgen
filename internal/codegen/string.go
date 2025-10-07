@@ -56,10 +56,10 @@ func formatLineComment(comment string) string {
 
 		for _, word := range words {
 			// NewIf current line is long enough we need to break it.
-			if cur >= lineLength {
-				buf.AppendString("\n//")
-				cur = 0
-			}
+			// if cur >= lineLength {
+			// 	buf.AppendString("\n//")
+			// 	cur = 0
+			// }
 
 			buf.AppendString(" ")
 			buf.AppendString(word)

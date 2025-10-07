@@ -150,8 +150,8 @@ func (co *typesCoder) buildStructForStatus(kind string) (err error) {
 
 func (co *typesCoder) addImports(version string, managed bool) {
 	pkgs := co.gen.NewGroup().AddPackage(version).NewImport().
-		AddAlias("k8s.io/apimachinery/pkg/apis/meta/v1", "metav1").
-		AddPath("k8s.io/apimachinery/pkg/runtime")
+		AddAlias("k8s.io/apimachinery/pkg/apis/meta/v1", "metav1")
+		//AddPath("k8s.io/apimachinery/pkg/runtime")
 
 	if managed {
 		pkgs.AddAlias("github.com/krateoplatformops/provider-runtime/apis/common/v1", "commonv1")
@@ -172,7 +172,7 @@ func (co *typesCoder) buildEntryItemStructs(kind string, categories []string, ma
 		`+kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"`)
 	if managed {
 		grp.AddLineComment(
-			`+kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status`)
+			`+kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"`)
 	}
 
 	if len(categories) > 0 {
@@ -206,19 +206,19 @@ func (co *typesCoder) buildEntryItemStructs(kind string, categories []string, ma
 	grp = co.gen.NewGroup().AddLineComment("GetCondition of this %s", kind)
 	grp.NewFunction("GetCondition").
 		WithReceiver("mg", "*"+kind).
-		AddParameter("ct", "prv1.ConditionType").
-		AddResult("", "prv1.Condition").
+		AddParameter("ct", "commonv1.ConditionType").
+		AddResult("", "commonv1.Condition").
 		AddBody(gg.String("return mg.Status.GetCondition(ct)"))
 
 	grp = co.gen.NewGroup().AddLineComment("SetConditions of this %s", kind)
 	grp.NewFunction("SetConditions").
 		WithReceiver("mg", "*"+kind).
-		AddParameter("c", "...prv1.Condition").
+		AddParameter("c", "...commonv1.Condition").
 		AddBody(gg.String("mg.Status.SetConditions(c...)"))
 
 }
 
-func (co *typesCoder) buildEntryListStructs(kind string, categories []string, managed bool) {
+func (co *typesCoder) buildEntryListStructs(kind string, managed bool) {
 	name := kind + "List"
 
 	grp := co.gen.NewGroup().AddLine()
@@ -286,8 +286,9 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, cb func(*gg.
 			st.AddLineComment("+kubebuilder:title:%s", prop.Title)
 		}
 		if prop.Default != nil {
-			st.AddLineComment("+kubebuilder:default:%s", stringsutils.StrVal(prop.Default))
+			st.AddLineComment("+kubebuilder:default=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
 		}
+
 		if prop.Minimum != nil {
 			st.AddLineComment("+kubebuilder:validation:Minimum:%s",
 				stringsutils.StrVal(ptrutils.Deref(prop.Minimum, 0)))

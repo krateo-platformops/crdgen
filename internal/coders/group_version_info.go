@@ -43,11 +43,11 @@ func (co *groupVersionInfoCoder) addImports(group, version string) {
 func (co *groupVersionInfoCoder) addConst(group, version string) {
 	co.gen.NewGroup().AddLineComment("Package type metadata.").
 		NewConst().
-		AddField("Group", group).
-		AddField("Version", version)
+		AddField("Group", fmt.Sprintf("%q", group)).
+		AddField("Version", fmt.Sprintf("%q", version))
 }
 
-func (co *groupVersionInfoCoder) addVars(kind, group, version string) {
+func (co *groupVersionInfoCoder) addVars(kind string) {
 	co.gen.NewGroup().
 		NewVar().
 		AddField("SchemeGroupVersion", "schema.GroupVersion{Group: Group, Version: Version}").
