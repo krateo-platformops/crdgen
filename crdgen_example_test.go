@@ -10,9 +10,9 @@ import (
 )
 
 func TestGenerate(t *testing.T) {
-	os.Setenv("KEEP_CODE", "1")
+	//os.Setenv("KEEP_CODE", "1")
 
-	specSchemaBytes, err := os.ReadFile("./testdata/git.spec.schema.json")
+	specSchemaBytes, err := os.ReadFile("./testdata/array.enums.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
