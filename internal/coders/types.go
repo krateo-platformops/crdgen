@@ -150,8 +150,8 @@ func (co *typesCoder) buildStructForStatus(kind string) (err error) {
 
 func (co *typesCoder) addImports(version string, managed bool) {
 	pkgs := co.gen.NewGroup().AddPackage(version).NewImport().
-		AddAlias("k8s.io/apimachinery/pkg/apis/meta/v1", "metav1")
-		//AddPath("k8s.io/apimachinery/pkg/runtime")
+		AddAlias("k8s.io/apimachinery/pkg/apis/meta/v1", "metav1").
+		AddPath("k8s.io/apimachinery/pkg/runtime")
 
 	if managed {
 		pkgs.AddAlias("github.com/krateoplatformops/provider-runtime/apis/common/v1", "commonv1")
