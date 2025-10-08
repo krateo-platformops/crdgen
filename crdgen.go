@@ -8,12 +8,30 @@ import (
 	"github.com/krateoplatformops/plumbing/env"
 )
 
-func Generate(opts coders.Options) (dat []byte, err error) {
+type Options struct {
+	Group        string
+	Version      string
+	Kind         string
+	Categories   []string
+	SpecSchema   []byte
+	StatusSchema []byte
+	Managed      bool
+}
+
+func Generate(opts Options) (dat []byte, err error) {
 	os.Setenv("FORMAT", "1")
 
 	rootdir := os.TempDir()
 
-	err = coders.GenAll(rootdir, &opts)
+	err = coders.GenAll(rootdir, &coders.Options{
+		Group:        opts.Group,
+		Version:      opts.Version,
+		Kind:         opts.Kind,
+		Categories:   opts.Categories,
+		SpecSchema:   opts.SpecSchema,
+		StatusSchema: opts.StatusSchema,
+		Managed:      opts.Managed,
+	})
 	if err != nil {
 		return
 	}

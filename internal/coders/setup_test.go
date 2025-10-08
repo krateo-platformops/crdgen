@@ -10,13 +10,13 @@ import (
 func TestGenSetup(t *testing.T) {
 	os.Setenv("FORMAT", "1")
 
-	res := Options{
+	opts := Options{
 		Group:   "git.krateo.io",
 		Version: "v1alpha1",
 		Kind:    "Repo",
 	}
 
-	dat, err := GenSetup(&res)
+	dat, err := GenSetup(&opts)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -36,25 +36,25 @@ func SourceDir(rootdir, kind string) string {
 	return filepath.Join(parts...)
 }
 
-func GenAll(rootdir string, res *Options) error {
-	mod := ModuleName(res.Kind)
+func GenAll(rootdir string, opts *Options) error {
+	mod := ModuleName(opts.Kind)
 
-	err := WriteTypesToFile(rootdir, res)
+	err := WriteTypesToFile(rootdir, opts)
 	if err != nil {
 		return err
 	}
 
-	err = WriteGroupVersionInfoToFile(rootdir, res)
+	err = WriteGroupVersionInfoToFile(rootdir, opts)
 	if err != nil {
 		return err
 	}
 
-	err = WriteGenerateToFile(rootdir, res)
+	err = WriteGenerateToFile(rootdir, opts)
 	if err != nil {
 		return err
 	}
 
-	err = WriteSetupToFile(rootdir, res)
+	err = WriteSetupToFile(rootdir, opts)
 	if err != nil {
 		return err
 	}

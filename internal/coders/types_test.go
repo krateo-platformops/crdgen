@@ -20,7 +20,7 @@ func TestGenTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res := Options{
+	opts := Options{
 		Group:        "git.krateo.io",
 		Version:      "v1alpha1",
 		Kind:         "Repo",
@@ -30,7 +30,7 @@ func TestGenTypes(t *testing.T) {
 		Managed:      true,
 	}
 
-	dat, err := GenTypes(&res)
+	dat, err := GenTypes(&opts)
 	if err != nil {
 		t.Fatal(err)
 	}

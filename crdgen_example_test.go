@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/krateoplatformops/crdgen/v2"
-	"github.com/krateoplatformops/crdgen/v2/internal/coders"
 )
 
 func TestGenerate(t *testing.T) {
@@ -22,7 +21,7 @@ func TestGenerate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	yml, err := crdgen.Generate(coders.Options{
+	yml, err := crdgen.Generate(crdgen.Options{
 		Group:        "git.krateo.io",
 		Version:      "v1alpha1",
 		Kind:         "Repo",
@@ -46,7 +45,7 @@ func TestGenerateVCluster(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	yml, err := crdgen.Generate(coders.Options{
+	yml, err := crdgen.Generate(crdgen.Options{
 		Group:      "vcluster.krateo.io",
 		Version:    "v1alpha1",
 		Kind:       "VCluster",
