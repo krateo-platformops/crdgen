@@ -330,7 +330,7 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 	if t.AdditionalProperties != nil {
 		fieldType := "runtime.RawExtension"
 		tags := map[string]string{
-			"json": "inline,omitempty",
+			"json": ",inline,omitempty",
 		}
 		st.AddField("", fieldType, tags)
 	}
