@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestParse(t *testing.T) {
+func TestParseEnumArray(t *testing.T) {
 	const (
 		js = `{
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -33,4 +33,21 @@ func TestParse(t *testing.T) {
 	}
 
 	fmt.Printf("%+v\n", sch)
+}
+
+func TestParseAdditionalProperties(t *testing.T) {
+	const (
+		js = `{
+   "type": "object", 
+   "additionalProperties": true,
+   "x-kubernetes-preserve-unknown-fields": true
+}`
+	)
+
+	sch, err := FromJSONReader(strings.NewReader(js))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("%+v\n", sch.PreserveUnknownFields)
 }

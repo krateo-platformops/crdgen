@@ -213,7 +213,7 @@ func GenTypes(opts *Options) (dat []byte, err error) {
 		return nil, err
 	}
 
-	err = co.buildStructForStatus(opts.Kind)
+	err = co.buildStructForStatus(opts.Kind, opts.Managed)
 	if err != nil {
 		return nil, err
 	}

@@ -38,7 +38,7 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestGenerateVCluster(t *testing.T) {
-	os.Setenv("KEEP_CODE", "1")
+	//os.Setenv("KEEP_CODE", "1")
 
 	specSchemaBytes, err := os.ReadFile("./testdata/vcluster.schema.json")
 	if err != nil {

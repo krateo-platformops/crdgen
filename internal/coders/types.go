@@ -127,19 +127,30 @@ func (co *typesCoder) buildStructForSpec(kind string) (err error) {
 	return nil
 }
 
-func (co *typesCoder) buildStructForStatus(kind string) (err error) {
+func (co *typesCoder) buildStructForStatus(kind string, managed bool) (err error) {
 	if co.statusSchema == nil {
 		return
 	}
 
 	rootName := kind + "Status"
 	rootType := schemaAsType(co.statusSchema)
-	//rootType = resolveRefsInType(rootType, resolvedDefs)
-	if len(rootType.Properties) > 0 {
-		err = co.buildStruct(rootName, rootType, func(st *gg.IStruct) {
-			st.AddField("commonv1.ConditionedStatus", "",
-				map[string]string{"json": ",inline"})
-		})
+
+	if rootType != nil {
+		applyFn := []func(st *gg.IStruct){}
+		if rootType.PreserveUnknownFields {
+			applyFn = append(applyFn, func(st *gg.IStruct) {
+				st.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
+			})
+		}
+
+		if managed {
+			applyFn = append(applyFn, func(st *gg.IStruct) {
+				st.AddField("commonv1.ConditionedStatus", "",
+					map[string]string{"json": ",inline"})
+			})
+		}
+
+		err = co.buildStruct(rootName, rootType, applyFn...)
 		if err != nil {
 			return err
 		}
@@ -250,15 +261,19 @@ func (co *typesCoder) buildEntryListStructs(kind string, managed bool) {
 		AddBody("return items")
 }
 
-func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, cb func(*gg.IStruct)) error {
+func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...func(*gg.IStruct)) error {
 	if co.generatedStructs[typeName] {
 		return nil // già generata
 	}
 	co.generatedStructs[typeName] = true
 
 	st := co.gen.NewGroup().NewStruct(typeName)
-	if cb != nil {
-		cb(st)
+
+	for _, fn := range applyFn {
+		if fn == nil {
+			continue
+		}
+		fn(st)
 	}
 
 	for name, prop := range t.Properties {
@@ -310,6 +325,14 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, cb func(*gg.
 		}
 
 		st.AddField(fieldName, fieldType, tags)
+	}
+
+	if t.AdditionalProperties != nil {
+		fieldType := "runtime.RawExtension"
+		tags := map[string]string{
+			"json": "inline,omitempty",
+		}
+		st.AddField("", fieldType, tags)
 	}
 
 	return nil
@@ -375,17 +398,13 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 	}
 
 	// oggetto con proprietà → genera struct
-	if t.Type.Equals(schemas.TypeList{"object"}) && len(t.Properties) > 0 {
-		if !co.generatedStructs[typeName] {
-			co.buildStruct(typeName, t, nil)
+	if t.Type.Equals(schemas.TypeList{"object"}) {
+		if t != nil {
+			if !co.generatedStructs[typeName] {
+				co.buildStruct(typeName, t, nil)
+			}
+			return typeName
 		}
-		return typeName
-	}
-
-	// Oggetto con AdditionalProperties (map)
-	if t.Type.Equals(schemas.TypeList{"object"}) && t.AdditionalProperties != nil {
-		valType := co.resolveType(typeName+"Value", t.AdditionalProperties)
-		return "map[string]" + valType
 	}
 
 	// object con AdditionalProperties o fallback

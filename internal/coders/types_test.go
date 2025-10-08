@@ -10,15 +10,25 @@ import (
 func TestGenTypes(t *testing.T) {
 	os.Setenv("FORMAT", "1")
 
+	const (
+		preserveUnknownFields = `{
+   "type": "object", 
+   "additionalProperties": true,
+   "x-kubernetes-preserve-unknown-fields": true
+}`
+	)
+
 	specSchemaBytes, err := os.ReadFile("../../testdata/git.spec.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	statusSchemaBytes, err := os.ReadFile("../../testdata/git.status.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
+	// statusSchemaBytes, err := os.ReadFile("../../testdata/git.status.schema.json")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	statusSchemaBytes := []byte(preserveUnknownFields)
 
 	opts := Options{
 		Group:        "git.krateo.io",
@@ -27,7 +37,7 @@ func TestGenTypes(t *testing.T) {
 		Categories:   []string{"krateo", "git", "repo"},
 		SpecSchema:   specSchemaBytes,
 		StatusSchema: statusSchemaBytes,
-		Managed:      true,
+		Managed:      false,
 	}
 
 	dat, err := GenTypes(&opts)

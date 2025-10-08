@@ -171,6 +171,8 @@ type Type struct {
 	// to use for the field.
 	GoJSONSchemaExtension *GoJSONSchemaExtension `json:"goJSONSchema,omitempty"` //nolint:tagliatelle // breaking change
 
+	PreserveUnknownFields bool `json:"x-kubernetes-preserve-unknown-fields,omitempty"`
+
 	// SubSchemaType marks the type as being a subschema type.
 	subSchemaType     SubSchemaType `json:"-"`
 	subSchemasCount   int           `json:"-"`
