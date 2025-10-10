@@ -86,6 +86,8 @@ func DefaultValForKubebuilder(def any) string {
 			parts[i] = fmt.Sprintf("%s: %v", k, formatMapValue(v[k]))
 		}
 		return fmt.Sprintf("{%s}", strings.Join(parts, ", "))
+	case string:
+		return fmt.Sprintf("%q", v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}

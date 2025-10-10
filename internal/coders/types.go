@@ -397,7 +397,6 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 		return "[]runtime.RawExtension"
 	}
 
-	// oggetto con proprietà → genera struct
 	if t.Type.Equals(schemas.TypeList{"object"}) {
 		if t != nil {
 			if !co.generatedStructs[typeName] {
@@ -407,7 +406,6 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 		}
 	}
 
-	// object con AdditionalProperties o fallback
 	return jsonSchemaToGoType(t)
 }
 

@@ -1,34 +1,12 @@
 package coders
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/krateoplatformops/crdgen/v2/internal/schemas"
 )
 
-/*
-	func schemaAsType(s *schemas.Schema) *schemas.Type {
-		return &schemas.Type{
-			Type:                 s.Type,
-			Properties:           s.Properties,
-			Items:                s.Items,
-			Enum:                 s.Enum,
-			Format:               s.Format,
-			Required:             s.Required,
-			AdditionalProperties: s.AdditionalProperties,
-			AllOf:                s.AllOf,
-			OneOf:                s.OneOf,
-			AnyOf:                s.AnyOf,
-			Default:              s.Default,
-			Minimum:              s.Minimum,
-			Maximum:              s.Maximum,
-			MultipleOf:           s.MultipleOf,
-			Pattern:              s.Pattern,
-			Definitions:          s.Definitions,
-			Ref:                  s.Ref,
-		}
-	}
-*/
 func schemaAsType(s *schemas.Schema) *schemas.Type {
 	if s == nil {
 		return nil
@@ -39,8 +17,6 @@ func schemaAsType(s *schemas.Schema) *schemas.Type {
 		return deepCopyType((*schemas.Type)(s.ObjectAsType))
 	}
 
-	// fallback: costruisci un Type dai campi "a mano" se non c'è l'embed
-	// (solitamente non necessario se il tuo Schema ha sempre ObjectAsType)
 	t := &schemas.Type{
 		Type:                 s.Type,
 		Properties:           s.Properties,
@@ -153,7 +129,6 @@ func deepCopyType(t *schemas.Type) *schemas.Type {
 		}
 	}
 
-	// copia GoJSONSchemaExtension (se presente)
 	if t.GoJSONSchemaExtension != nil {
 		g := *t.GoJSONSchemaExtension
 		if g.Imports != nil {
@@ -161,10 +136,6 @@ func deepCopyType(t *schemas.Type) *schemas.Type {
 		}
 		c.GoJSONSchemaExtension = &g
 	}
-
-	// NOTA: campi scalari (float64, string, bool, interface{}) sono già copiati
-	// con la copia superficiale iniziale (c := *t). Se vuoi deep copy anche degli
-	// elementi di Enum (interface{} complessi), dovrai gestirli caso per caso.
 
 	return &c
 }
@@ -290,16 +261,24 @@ func jsonSchemaToGoType(t *schemas.Type) string {
 	return "runtime.RawExtension"
 }
 
+var nonAlphaNum = regexp.MustCompile(`[^a-zA-Z0-9]+`)
+
+// exportedName converts a JSON-style key into a valid Go exported field name.
 func exportedName(name string) string {
 	if name == "" {
-		return name
+		return ""
 	}
+
+	// Replace non-alphanumeric separators (e.g., -, _, space, .) with a single underscore
+	name = nonAlphaNum.ReplaceAllString(name, "_")
 
 	parts := strings.Split(name, "_")
 	for i, p := range parts {
-		if len(p) > 0 {
-			parts[i] = strings.ToUpper(p[:1]) + p[1:]
+		if p == "" {
+			continue
 		}
+		parts[i] = strings.ToUpper(p[:1]) + strings.ToLower(p[1:])
 	}
+
 	return strings.Join(parts, "")
 }

@@ -65,3 +65,47 @@ func TestGenerateVCluster(t *testing.T) {
 	//io.Copy(f, strings.NewReader(string(yml)))
 	fmt.Println(string(yml))
 }
+
+func TestIssueWrongCaseFields(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
+
+	const (
+		js = `{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "greet-ing": {
+        "type": "string"
+      },
+      "dis_play": {
+        "type": "integer",
+        "default": 1
+      },
+      "verb--ose": {
+        "type": "boolean",
+        "default": false
+      },
+      "url": {
+        "type": "string",
+        "default": "https://github.com/krateoplatformops/sticz"
+      }
+    },
+    "required": [
+      "greeting"
+    ]
+  }`
+	)
+
+	yml, err := crdgen.Generate(crdgen.Options{
+		Group:      "krateo.io",
+		Version:    "v1alpha1",
+		Kind:       "Hello",
+		Categories: []string{"krateo", "hello"},
+		SpecSchema: []byte(js),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(yml))
+}
