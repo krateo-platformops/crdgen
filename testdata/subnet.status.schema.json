@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "metadata": {
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "x-crdgen-identifier-name": "Metadata2"
+    }
+  },
+  "type": "object"
+}

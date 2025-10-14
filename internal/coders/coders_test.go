@@ -9,26 +9,27 @@ import (
 )
 
 func TestGenAll(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
 	os.Setenv("FORMAT", "1")
 
 	rootdir := os.TempDir()
 
-	specSchemaBytes, err := os.ReadFile("../../testdata/array.enums.schema.json")
+	specSchemaBytes, err := os.ReadFile("../../testdata/subnet.spec.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var statusSchemaBytes []byte
-	// statusSchemaBytes, err = os.ReadFile("../../testdata/git.status.schema.json")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	statusSchemaBytes, err = os.ReadFile("../../testdata/subnet.status.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	opts := Options{
-		Group:        "git.krateo.io",
+		Group:        "vclusters.subnet.krateo.io",
 		Version:      "v1alpha1",
-		Kind:         "Repo",
-		Categories:   []string{"krateo", "git", "repo"},
+		Kind:         "Subnet",
+		Categories:   []string{"krateo", "vcluster"},
 		SpecSchema:   specSchemaBytes,
 		StatusSchema: statusSchemaBytes,
 		Managed:      false,

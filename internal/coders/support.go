@@ -2,6 +2,7 @@ package coders
 
 import (
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/krateoplatformops/crdgen/v2/internal/schemas"
@@ -129,14 +130,6 @@ func deepCopyType(t *schemas.Type) *schemas.Type {
 		}
 	}
 
-	if t.GoJSONSchemaExtension != nil {
-		g := *t.GoJSONSchemaExtension
-		if g.Imports != nil {
-			g.Imports = append([]string(nil), g.Imports...)
-		}
-		c.GoJSONSchemaExtension = &g
-	}
-
 	return &c
 }
 
@@ -186,18 +179,13 @@ func resolveRefDefs(t *schemas.Type, defs schemas.Definitions, visited map[strin
 	return t, nil
 }
 
-func isNullable(t *schemas.Type) bool {
-	for _, typ := range t.Type {
-		if typ == "null" {
-			return true
-		}
-	}
-	return false
-}
-
 func isRequired(schema *schemas.Type, key string) bool {
 	if schema == nil {
 		return false
+	}
+
+	if slices.Contains(schema.Type, "null") {
+		return true
 	}
 
 	for _, el := range schema.Required {

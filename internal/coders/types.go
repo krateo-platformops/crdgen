@@ -114,9 +114,13 @@ func (co *typesCoder) buildStructForSpec(kind string) (err error) {
 		return
 	}
 
-	rootName := kind + "Spec"
 	rootType := schemaAsType(co.specSchema)
-	//rootType = resolveRefsInType(rootType, resolvedDefs)
+	if rootType == nil {
+		return nil
+	}
+
+	rootName := kind + "Spec"
+
 	if len(rootType.Properties) > 0 {
 		err = co.buildStruct(rootName, rootType, nil)
 		if err != nil {
@@ -132,28 +136,30 @@ func (co *typesCoder) buildStructForStatus(kind string, managed bool) (err error
 		return
 	}
 
-	rootName := kind + "Status"
 	rootType := schemaAsType(co.statusSchema)
+	if rootType == nil {
+		return nil
+	}
 
-	if rootType != nil {
-		applyFn := []func(st *gg.IStruct){}
-		if rootType.PreserveUnknownFields {
-			applyFn = append(applyFn, func(st *gg.IStruct) {
-				st.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
-			})
-		}
+	rootName := kind + "Status"
 
-		if managed {
-			applyFn = append(applyFn, func(st *gg.IStruct) {
-				st.AddField("commonv1.ConditionedStatus", "",
-					map[string]string{"json": ",inline"})
-			})
-		}
+	applyFn := []func(st *gg.IStruct){}
+	if rootType.PreserveUnknownFields {
+		applyFn = append(applyFn, func(st *gg.IStruct) {
+			st.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
+		})
+	}
 
-		err = co.buildStruct(rootName, rootType, applyFn...)
-		if err != nil {
-			return err
-		}
+	if managed {
+		applyFn = append(applyFn, func(st *gg.IStruct) {
+			st.AddField("commonv1.ConditionedStatus", "",
+				map[string]string{"json": ",inline"})
+		})
+	}
+
+	err = co.buildStruct(rootName, rootType, applyFn...)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -281,22 +287,21 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 
 		fieldType := co.resolveType(fieldName, prop)
 
-		if isNullable(prop) && !strings.HasPrefix(fieldType, "*") && fieldType != "runtime.RawExtension" {
+		nullable := !isRequired(t, name)
+
+		if nullable && !strings.HasPrefix(fieldType, "*") && fieldType != "runtime.RawExtension" {
 			fieldType = "*" + fieldType
 		}
 
 		// tag json
 		tags := map[string]string{}
-		if isNullable(prop) || strings.HasPrefix(fieldType, "*") {
+		if nullable {
 			tags["json"] = fmt.Sprintf("%s,omitempty", name)
 		} else {
 			tags["json"] = name
 		}
 
 		// kubebuilder annotations
-		if isRequired(t, name) {
-			st.AddLineComment("+required")
-		}
 		if prop.Title != "" {
 			st.AddLineComment("+kubebuilder:title:%s", prop.Title)
 		}
@@ -363,7 +368,7 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 	}
 
 	// Nullable: ["null", "type"]
-	if isNullable(t) && len(t.Type) == 2 {
+	if slices.Contains(t.Type, "null") && len(t.Type) == 2 {
 		nonNullType := &schemas.Type{Type: schemas.TypeList{}}
 		for _, typ := range t.Type {
 			if typ != "null" {
@@ -399,6 +404,11 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 
 	if t.Type.Equals(schemas.TypeList{"object"}) {
 		if t != nil {
+
+			if t.CrdgenIdentifierName != nil {
+				typeName = ptrutils.Deref(t.CrdgenIdentifierName, typeName)
+			}
+
 			if !co.generatedStructs[typeName] {
 				co.buildStruct(typeName, t, nil)
 			}

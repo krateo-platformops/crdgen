@@ -167,11 +167,8 @@ type Type struct {
 	//       from hyper-schema to validation meta-data...
 	ReadOnly bool `json:"readOnly,omitempty"`
 
-	// ExtGoCustomType is the name of a (qualified or not) custom Go type
-	// to use for the field.
-	GoJSONSchemaExtension *GoJSONSchemaExtension `json:"goJSONSchema,omitempty"` //nolint:tagliatelle // breaking change
-
-	PreserveUnknownFields bool `json:"x-kubernetes-preserve-unknown-fields,omitempty"`
+	PreserveUnknownFields bool    `json:"x-kubernetes-preserve-unknown-fields,omitempty"`
+	CrdgenIdentifierName  *string `json:"x-crdgen-identifier-name,omitempty"`
 
 	// SubSchemaType marks the type as being a subschema type.
 	subSchemaType     SubSchemaType `json:"-"`
