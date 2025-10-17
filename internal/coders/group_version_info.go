@@ -30,23 +30,26 @@ func (co *groupVersionInfoCoder) bytes(gofmt bool) ([]byte, error) {
 }
 
 func (co *groupVersionInfoCoder) addImports(group, version string) {
-	normVer := normalizeVersion(version)
+	goVer := normalizeVersion(version, '_')
+	crdVer := normalizeVersion(version, '-')
 
 	co.gen.NewGroup().
 		AddLineComment("+kubebuilder:object:generate=true").
 		AddLineComment("+groupName=%s", group).
-		AddLineComment("+versionName=%s", version).
-		AddPackage(normVer).NewImport().
+		AddLineComment("+versionName=%s", crdVer).
+		AddPackage(goVer).NewImport().
 		AddPath("reflect").
 		AddPath("k8s.io/apimachinery/pkg/runtime/schema").
 		AddPath("sigs.k8s.io/controller-runtime/pkg/scheme")
 }
 
 func (co *groupVersionInfoCoder) addConst(group, version string) {
+	crdVer := normalizeVersion(version, '-')
+
 	co.gen.NewGroup().AddLineComment("Package type metadata.").
 		NewConst().
 		AddField("Group", fmt.Sprintf("%q", group)).
-		AddField("Version", fmt.Sprintf("%q", version))
+		AddField("Version", fmt.Sprintf("%q", crdVer))
 }
 
 func (co *groupVersionInfoCoder) addVars(kind string) {

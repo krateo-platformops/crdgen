@@ -31,13 +31,13 @@ func (co *setupCoder) bytes(gofmt bool) ([]byte, error) {
 }
 
 func (co *setupCoder) addImports(kind, version string) {
-	normVer := normalizeVersion(version)
+	goVer := normalizeVersion(version, '_')
 
 	co.gen.NewGroup().
 		AddPackage("apis").NewImport().
 		AddPath("k8s.io/apimachinery/pkg/runtime").
 		AddPath(fmt.Sprintf("%s/apis/%s/%s",
-			ModuleName(kind), strings.ToLower(kind), normVer))
+			ModuleName(kind), strings.ToLower(kind), goVer))
 }
 
 func (co *setupCoder) addVar() {

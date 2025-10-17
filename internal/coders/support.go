@@ -271,18 +271,23 @@ func exportedName(name string) string {
 	return strings.Join(parts, "")
 }
 
-func normalizeVersion(ver string) string {
-	// Lowercase for consistency
+// For go package and k8s version must complain to this pattern:
+//
+// [a-z]([-a-z0-9]*[a-z0-9])?
+//
+// Go package folders allow only underscore char ('_')
+// K8s CRD version allow only dash char ('-')
+func normalizeVersion(ver string, replaceChar rune) string {
 	ver = strings.ToLower(ver)
 
-	// Replace all non-alphanumeric characters with underscore
+	// Sostituisce tutti i caratteri non alfanumerici con replaceChar
 	re := regexp.MustCompile(`[^a-z0-9]+`)
-	ver = re.ReplaceAllString(ver, "_")
+	ver = re.ReplaceAllString(ver, string(replaceChar))
 
-	// Trim underscores at start/end
-	ver = strings.Trim(ver, "_")
+	// Rimuove caratteri speciali all'inizio e alla fine
+	ver = strings.Trim(ver, string(replaceChar))
 
-	// Ensure it doesn't start with a digit
+	// Assicura che inizi con una lettera
 	if len(ver) > 0 && ver[0] >= '0' && ver[0] <= '9' {
 		ver = "v" + ver
 	}

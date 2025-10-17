@@ -166,9 +166,9 @@ func (co *typesCoder) buildStructForStatus(kind string, managed bool) (err error
 }
 
 func (co *typesCoder) addImports(version string, managed bool) {
-	normVer := normalizeVersion(version)
+	goVer := normalizeVersion(version, '_')
 
-	pkgs := co.gen.NewGroup().AddPackage(normVer).NewImport().
+	pkgs := co.gen.NewGroup().AddPackage(goVer).NewImport().
 		AddAlias("k8s.io/apimachinery/pkg/apis/meta/v1", "metav1").
 		AddPath("k8s.io/apimachinery/pkg/runtime")
 
