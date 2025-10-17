@@ -26,7 +26,7 @@ func TestGenerate(t *testing.T) {
 
 	yml, err := crdgen.Generate(crdgen.Options{
 		Group:        "git.krateo.io",
-		Version:      "v1alpha1",
+		Version:      "v1.2.3",
 		Kind:         "Repo",
 		Categories:   []string{"krateo", "git", "repo"},
 		SpecSchema:   specSchemaBytes,
