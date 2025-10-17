@@ -50,7 +50,7 @@ func TestGenerateVCluster(t *testing.T) {
 
 	yml, err := crdgen.Generate(crdgen.Options{
 		Group:      "vcluster.krateo.io",
-		Version:    "v1alpha1",
+		Version:    "v1.2.3",
 		Kind:       "VCluster",
 		Categories: []string{"krateo", "vcluster"},
 		SpecSchema: specSchemaBytes,

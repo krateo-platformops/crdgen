@@ -270,3 +270,22 @@ func exportedName(name string) string {
 
 	return strings.Join(parts, "")
 }
+
+func normalizeVersion(ver string) string {
+	// Lowercase for consistency
+	ver = strings.ToLower(ver)
+
+	// Replace all non-alphanumeric characters with underscore
+	re := regexp.MustCompile(`[^a-z0-9]+`)
+	ver = re.ReplaceAllString(ver, "_")
+
+	// Trim underscores at start/end
+	ver = strings.Trim(ver, "_")
+
+	// Ensure it doesn't start with a digit
+	if len(ver) > 0 && ver[0] >= '0' && ver[0] <= '9' {
+		ver = "v" + ver
+	}
+
+	return ver
+}

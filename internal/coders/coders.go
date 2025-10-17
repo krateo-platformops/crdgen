@@ -131,9 +131,11 @@ func WriteGenerateToFile(rootdir string, opts *Options) error {
 func WriteGroupVersionInfoToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
+	normVer := normalizeVersion(opts.Version)
+
 	parts := []string{rootdir}
 	parts = append(parts, strings.Split(mod, "/")...)
-	parts = append(parts, "apis", strings.ToLower(opts.Kind), opts.Version)
+	parts = append(parts, "apis", strings.ToLower(opts.Kind), normVer)
 
 	workdir := filepath.Join(parts...)
 	err := os.MkdirAll(workdir, os.ModePerm)
@@ -161,9 +163,11 @@ func WriteGroupVersionInfoToFile(rootdir string, opts *Options) error {
 func WriteTypesToFile(rootdir string, opts *Options) error {
 	mod := ModuleName(opts.Kind)
 
+	normVer := normalizeVersion(opts.Version)
+
 	parts := []string{rootdir}
 	parts = append(parts, strings.Split(mod, "/")...)
-	parts = append(parts, "apis", strings.ToLower(opts.Kind), opts.Version)
+	parts = append(parts, "apis", strings.ToLower(opts.Kind), normVer)
 
 	workdir := filepath.Join(parts...)
 	err := os.MkdirAll(workdir, os.ModePerm)

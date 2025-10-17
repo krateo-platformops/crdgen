@@ -30,11 +30,13 @@ func (co *groupVersionInfoCoder) bytes(gofmt bool) ([]byte, error) {
 }
 
 func (co *groupVersionInfoCoder) addImports(group, version string) {
+	normVer := normalizeVersion(version)
+
 	co.gen.NewGroup().
 		AddLineComment("+kubebuilder:object:generate=true").
 		AddLineComment("+groupName=%s", group).
 		AddLineComment("+versionName=%s", version).
-		AddPackage(version).NewImport().
+		AddPackage(normVer).NewImport().
 		AddPath("reflect").
 		AddPath("k8s.io/apimachinery/pkg/runtime/schema").
 		AddPath("sigs.k8s.io/controller-runtime/pkg/scheme")
