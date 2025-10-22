@@ -19,7 +19,7 @@ type Options struct {
 }
 
 func Generate(opts Options) (dat []byte, err error) {
-	os.Setenv("FORMAT", "1")
+	os.Setenv(coders.EnvFormatCode, "1")
 
 	rootdir := os.TempDir()
 
@@ -37,7 +37,7 @@ func Generate(opts Options) (dat []byte, err error) {
 	}
 
 	srcdir := coders.SourceDir(rootdir, opts.Kind)
-	if !env.True("KEEP_CODE") {
+	if !env.True(coders.EnvKeepCode) {
 		defer os.RemoveAll(srcdir)
 	}
 

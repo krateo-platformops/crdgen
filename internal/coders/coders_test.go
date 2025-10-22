@@ -9,8 +9,8 @@ import (
 )
 
 func TestGenAll(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-	os.Setenv("FORMAT", "1")
+	//os.Setenv(EnvKeepCode, "1")
+	os.Setenv(EnvFormatCode, "1")
 
 	rootdir := os.TempDir()
 

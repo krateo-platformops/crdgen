@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenGroupVersionInfo(t *testing.T) {
-	os.Setenv("FORMAT", "1")
+	os.Setenv(EnvFormatCode, "1")
 
 	specSchemaBytes, err := os.ReadFile("../../testdata/git.spec.schema.json")
 	if err != nil {

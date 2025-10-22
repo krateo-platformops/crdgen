@@ -13,6 +13,12 @@ import (
 	"github.com/krateoplatformops/plumbing/env"
 )
 
+const (
+	EnvFormatCode = "FORMAT_CODE"
+	EnvKeepCode   = "KEEP_CODE"
+	EnvVerbose    = "VERBOSE"
+)
+
 type Options struct {
 	Group        string
 	Version      string
@@ -225,7 +231,7 @@ func GenTypes(opts *Options) (dat []byte, err error) {
 	co.buildEntryItemStructs(opts.Kind, opts.Categories, opts.Managed)
 	co.buildEntryListStructs(opts.Kind, opts.Managed)
 
-	return co.bytes(env.True("FORMAT"))
+	return co.bytes(env.True(EnvFormatCode))
 }
 
 func GenGroupVersionInfo(opts *Options) (dat []byte, err error) {
@@ -238,7 +244,7 @@ func GenGroupVersionInfo(opts *Options) (dat []byte, err error) {
 
 	co.initFunc(opts.Kind)
 
-	return co.bytes(env.True("FORMAT"))
+	return co.bytes(env.True(EnvFormatCode))
 }
 
 func GenGenerate(opts *Options) (dat []byte, err error) {
@@ -246,7 +252,7 @@ func GenGenerate(opts *Options) (dat []byte, err error) {
 
 	co.generate()
 
-	return co.bytes(env.True("FORMAT"))
+	return co.bytes(env.True(EnvFormatCode))
 }
 
 func GenSetup(opts *Options) (dat []byte, err error) {
@@ -256,5 +262,5 @@ func GenSetup(opts *Options) (dat []byte, err error) {
 	co.addVar()
 	co.addFuncs()
 
-	return co.bytes(env.True("FORMAT"))
+	return co.bytes(env.True(EnvFormatCode))
 }

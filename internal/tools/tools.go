@@ -2,9 +2,12 @@ package tools
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/krateoplatformops/plumbing/env"
 )
 
 func Tidy(dir string) error {
@@ -19,8 +22,13 @@ func Tidy(dir string) error {
 
 	cmd.Dir = absDir
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	if env.True("VERBOSE") {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stdout = io.Discard
+		cmd.Stderr = io.Discard
+	}
 
 	return cmd.Run()
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenSetup(t *testing.T) {
-	os.Setenv("FORMAT", "1")
+	os.Setenv(EnvFormatCode, "1")
 
 	opts := Options{
 		Group:   "git.krateo.io",
