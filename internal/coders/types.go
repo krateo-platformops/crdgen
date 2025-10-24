@@ -206,15 +206,15 @@ func (co *typesCoder) buildEntryItemStructs(kind string, categories []string, ma
 		"json": ",inline",
 	})
 	st.AddField("", "metav1.ObjectMeta", map[string]string{
-		"json": "metadata",
+		"json": "metadata,omitempty",
 	})
 	st.AddField("Spec", kind+"Spec", map[string]string{
-		"json": "spec",
+		"json": "spec,omitempty",
 	})
 
 	if co.statusSchema != nil {
-		st.AddField("Status", kind+"Status", map[string]string{
-			"json": "status",
+		st.AddField("Status", fmt.Sprintf("%sStatus", kind), map[string]string{
+			"json": "status,omitempty",
 		})
 	}
 
