@@ -101,6 +101,27 @@ func (t *TypeList) Equals(b TypeList) bool {
 	return true
 }
 
+type AdditionalProperties struct {
+	IsBool bool  // flag per sapere se è un booleano
+	Bool   bool  // valore del booleano (true/false)
+	Type   *Type // se è uno schema
+}
+
+func (ap *AdditionalProperties) UnmarshalJSON(data []byte) error {
+	dataStr := string(data)
+
+	// Caso booleano: true/false
+	if dataStr == "true" || dataStr == "false" {
+		ap.IsBool = true
+		ap.Bool = dataStr == "true"
+		return nil
+	}
+
+	// Caso oggetto: schema JSON
+	ap.Type = &Type{}
+	return json.Unmarshal(data, ap.Type)
+}
+
 // Definitions hold schema definitions.
 // http://json-schema.org/latest/json-schema-validation.html#rfc.section.5.26
 // RFC draft-wright-json-schema-validation-00, section 5.26.
@@ -139,7 +160,7 @@ type Type struct {
 	Required             []string         `json:"required,omitempty"`             // Section 5.15.
 	Properties           map[string]*Type `json:"properties,omitempty"`           // Section 5.16.
 	PatternProperties    map[string]*Type `json:"patternProperties,omitempty"`    // Section 5.17.
-	AdditionalProperties *Type            `json:"additionalProperties,omitempty"` // Section 5.18.
+	AdditionalProperties *bool            `json:"additionalProperties,omitempty"` // Section 5.18.
 	Enum                 []interface{}    `json:"enum,omitempty"`                 // Section 5.20.
 	Type                 TypeList         `json:"type,omitempty"`                 // Section 5.21.
 	// RFC draft-bhutton-json-schema-01, section 10.
@@ -167,7 +188,7 @@ type Type struct {
 	//       from hyper-schema to validation meta-data...
 	ReadOnly bool `json:"readOnly,omitempty"`
 
-	PreserveUnknownFields bool    `json:"x-kubernetes-preserve-unknown-fields,omitempty"`
+	PreserveUnknownFields *bool   `json:"x-kubernetes-preserve-unknown-fields,omitempty"`
 	CrdgenIdentifierName  *string `json:"x-crdgen-identifier-name,omitempty"`
 
 	// SubSchemaType marks the type as being a subschema type.

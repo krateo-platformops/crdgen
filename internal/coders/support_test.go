@@ -1,6 +1,12 @@
 package coders
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/krateoplatformops/crdgen/v2/internal/schemas"
+)
 
 func TestNormalizeVersion(t *testing.T) {
 	tests := []struct {
@@ -34,4 +40,22 @@ func TestNormalizeVersion(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestParseAdditionalProperties(t *testing.T) {
+	const (
+		js = `{
+   "type": "object", 
+   "additionalProperties": false,
+   "x-kubernetes-preserve-unknown-fields": false
+}`
+	)
+
+	sch, err := schemas.FromJSONReader(strings.NewReader(js))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ok := mustPreserveUnknownFields((*schemas.Type)(sch.ObjectAsType))
+	fmt.Println(ok)
 }

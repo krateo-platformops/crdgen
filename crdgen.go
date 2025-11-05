@@ -1,6 +1,7 @@
 package crdgen
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/krateoplatformops/crdgen/v2/internal/coders"
@@ -39,6 +40,8 @@ func Generate(opts Options) (dat []byte, err error) {
 	srcdir := coders.SourceDir(rootdir, opts.Kind)
 	if !env.True(coders.EnvKeepCode) {
 		defer os.RemoveAll(srcdir)
+	} else {
+		fmt.Fprintf(os.Stderr, "generated code dir: %s\n", srcdir)
 	}
 
 	err = tools.Tidy(srcdir)

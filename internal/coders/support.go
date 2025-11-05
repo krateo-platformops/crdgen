@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/krateoplatformops/crdgen/v2/internal/schemas"
+	"github.com/krateoplatformops/crdgen/v2/internal/utils/ptr"
 )
 
 func schemaAsType(s *schemas.Schema) *schemas.Type {
@@ -39,6 +40,14 @@ func schemaAsType(s *schemas.Schema) *schemas.Type {
 	}
 
 	return deepCopyType(t)
+}
+
+func deepCopyBool(b *bool) *bool {
+	if b == nil {
+		return nil
+	}
+	v := *b
+	return &v
 }
 
 // deepCopyType esegue una copia ricorsiva di *schemas.Type
@@ -102,7 +111,7 @@ func deepCopyType(t *schemas.Type) *schemas.Type {
 
 	// copy AdditionalProperties
 	if t.AdditionalProperties != nil {
-		c.AdditionalProperties = deepCopyType(t.AdditionalProperties)
+		c.AdditionalProperties = deepCopyBool(t.AdditionalProperties)
 	}
 
 	// copy Items
@@ -197,6 +206,23 @@ func isRequired(schema *schemas.Type, key string) bool {
 	return false
 }
 
+func mustPreserveUnknownFields(schema *schemas.Type) bool {
+	if schema == nil {
+		return false
+	}
+
+	if ptr.Deref(schema.AdditionalProperties, false) {
+		return true
+	}
+
+	if schema.Type.Equals(schemas.TypeList{"object"}) &&
+		len(schema.Properties) == 0 {
+		return true
+	}
+
+	return ptr.Deref(schema.PreserveUnknownFields, false)
+}
+
 // jsonSchemaToGoType converte un JSON Schema type/format in un tipo Go compatibile CRD
 func jsonSchemaToGoType(t *schemas.Type) string {
 	switch {
@@ -233,14 +259,14 @@ func jsonSchemaToGoType(t *schemas.Type) string {
 		return "[]runtime.RawExtension"
 
 	case t.Type.Equals(schemas.TypeList{"object"}):
-		if t.AdditionalProperties != nil {
-			valType := jsonSchemaToGoType(t.AdditionalProperties)
-			return "map[string]" + valType
-		}
+		// if t.AdditionalProperties != nil {
+		// 	valType := jsonSchemaToGoType(t.AdditionalProperties.Schema)
+		// 	return "map[string]" + valType
+		// }
 		if len(t.Properties) > 0 {
 			// struct → deve essere costruita altrove (es. buildStruct)
 			// qui ritorniamo un placeholder
-			return ""
+			return "runtime.RawExtension"
 		}
 		return "runtime.RawExtension"
 	}

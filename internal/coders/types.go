@@ -121,6 +121,11 @@ func (co *typesCoder) buildStructForSpec(kind string) (err error) {
 
 	rootName := kind + "Spec"
 
+	if mustPreserveUnknownFields(rootType) {
+		grp := co.gen.NewGroup().AddLine()
+		grp.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
+	}
+
 	if len(rootType.Properties) > 0 {
 		err = co.buildStruct(rootName, rootType, nil)
 		if err != nil {
@@ -143,13 +148,12 @@ func (co *typesCoder) buildStructForStatus(kind string, managed bool) (err error
 
 	rootName := kind + "Status"
 
-	applyFn := []func(st *gg.IStruct){}
-	if rootType.PreserveUnknownFields {
-		applyFn = append(applyFn, func(st *gg.IStruct) {
-			st.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
-		})
+	if mustPreserveUnknownFields(rootType) {
+		grp := co.gen.NewGroup().AddLine()
+		grp.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
 	}
 
+	applyFn := []func(st *gg.IStruct){}
 	if managed {
 		applyFn = append(applyFn, func(st *gg.IStruct) {
 			st.AddField("commonv1.ConditionedStatus", "",
@@ -275,6 +279,11 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 	}
 	co.generatedStructs[typeName] = true
 
+	if mustPreserveUnknownFields(t) {
+		grp := co.gen.NewGroup().AddLine()
+		grp.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
+	}
+
 	st := co.gen.NewGroup().NewStruct(typeName)
 
 	for _, fn := range applyFn {
@@ -286,11 +295,9 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 
 	for name, prop := range t.Properties {
 		fieldName := exportedName(name)
-
 		fieldType := co.resolveType(fieldName, prop)
 
 		nullable := !isRequired(t, name)
-
 		if nullable && !strings.HasPrefix(fieldType, "*") && fieldType != "runtime.RawExtension" {
 			fieldType = "*" + fieldType
 		}
@@ -312,19 +319,23 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		}
 
 		if prop.Minimum != nil {
-			st.AddLineComment("+kubebuilder:validation:Minimum:%s",
+			st.AddLineComment("+kubebuilder:validation:Minimum=%s",
 				stringsutils.StrVal(ptrutils.Deref(prop.Minimum, 0)))
 		}
 		if prop.Maximum != nil {
-			st.AddLineComment("+kubebuilder:validation:Maximum:%s",
+			st.AddLineComment("+kubebuilder:validation:Maximum=%s",
 				stringsutils.StrVal(ptrutils.Deref(prop.Maximum, 0)))
 		}
 		if prop.MultipleOf != nil {
-			st.AddLineComment("+kubebuilder:validation:MultipleOf:%s",
+			st.AddLineComment("+kubebuilder:validation:MultipleOf=%s",
 				stringsutils.StrVal(ptrutils.Deref(prop.MultipleOf, 0)))
 		}
 		if prop.Pattern != "" {
-			st.AddLineComment("+kubebuilder:validation:Pattern:%s", prop.Pattern)
+			st.AddLineComment("+kubebuilder:validation:Pattern=`%s`", prop.Pattern)
+		}
+
+		if prop.Type.Equals(schemas.TypeList{"string"}) && len(prop.Enum) > 0 {
+			st.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(prop.Enum, ";"))
 		}
 
 		if prop.Description != "" {
@@ -332,14 +343,6 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		}
 
 		st.AddField(fieldName, fieldType, tags)
-	}
-
-	if t.AdditionalProperties != nil {
-		fieldType := "runtime.RawExtension"
-		tags := map[string]string{
-			"json": ",inline,omitempty",
-		}
-		st.AddField("", fieldType, tags)
 	}
 
 	return nil
@@ -405,17 +408,11 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 	}
 
 	if t.Type.Equals(schemas.TypeList{"object"}) {
-		if t != nil {
-
-			if t.CrdgenIdentifierName != nil {
-				typeName = ptrutils.Deref(t.CrdgenIdentifierName, typeName)
-			}
-
-			if !co.generatedStructs[typeName] {
-				co.buildStruct(typeName, t, nil)
-			}
-			return typeName
+		typeName = ptrutils.Deref(t.CrdgenIdentifierName, typeName)
+		if !co.generatedStructs[typeName] {
+			co.buildStruct(typeName, t, nil)
 		}
+		return typeName
 	}
 
 	return jsonSchemaToGoType(t)
@@ -428,7 +425,6 @@ func (co *typesCoder) emitEnum(typeName string, t *schemas.Type) string {
 	co.generatedEnums[typeName] = true
 
 	grp := co.gen.NewGroup()
-	grp.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(t.Enum, ";"))
 	grp.AddTypeAlias(typeName, "string")
 
 	consts := co.gen.NewGroup()

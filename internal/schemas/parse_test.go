@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestParseEnumArray(t *testing.T) {
@@ -39,7 +41,7 @@ func TestParseAdditionalProperties(t *testing.T) {
 	const (
 		js = `{
    "type": "object", 
-   "additionalProperties": true,
+   "additionalProperties": false,
    "x-kubernetes-preserve-unknown-fields": true
 }`
 	)
@@ -49,5 +51,5 @@ func TestParseAdditionalProperties(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("%+v\n", sch.PreserveUnknownFields)
+	spew.Dump(sch)
 }

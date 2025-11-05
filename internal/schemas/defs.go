@@ -43,9 +43,7 @@ func collectFromType(t *Type, out map[string]*Type) {
 	for _, p := range t.PatternProperties {
 		collectFromType(p, out)
 	}
-	if t.AdditionalProperties != nil {
-		collectFromType(t.AdditionalProperties, out)
-	}
+
 	if t.Items != nil {
 		collectFromType(t.Items, out)
 	}

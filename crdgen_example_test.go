@@ -40,20 +40,26 @@ func TestGenerate(t *testing.T) {
 	fmt.Println(string(yml))
 }
 
-func TestGenerateVCluster(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
+func TestGenerateButtonSchema(t *testing.T) {
+	os.Setenv("KEEP_CODE", "1")
 
-	specSchemaBytes, err := os.ReadFile("./testdata/vcluster.schema.json")
+	const (
+		widgetsGroup          = "widgets.templates.krateo.io"
+		preserveUnknownFields = `{"type": "object", "additionalProperties": true,"x-kubernetes-preserve-unknown-fields": true}`
+	)
+
+	specSchemaBytes, err := os.ReadFile("./testdata/button.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "vcluster.krateo.io",
-		Version:    "v1.2.3",
-		Kind:       "VCluster",
-		Categories: []string{"krateo", "vcluster"},
-		SpecSchema: specSchemaBytes,
+		Group:        widgetsGroup,
+		Version:      "v0.0.7",
+		Kind:         "Button",
+		Categories:   []string{"krateo", "widgets"},
+		SpecSchema:   specSchemaBytes,
+		StatusSchema: []byte(preserveUnknownFields),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -63,6 +69,32 @@ func TestGenerateVCluster(t *testing.T) {
 	// defer f.Close()
 
 	//io.Copy(f, strings.NewReader(string(yml)))
+	fmt.Println(string(yml))
+}
+
+func TestGenerateGithubScaffolding(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
+
+	const (
+		widgetsGroup = "github.krateo.io"
+	)
+
+	specSchemaBytes, err := os.ReadFile("./testdata/github-scaffolding.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	yml, err := crdgen.Generate(crdgen.Options{
+		Group:      widgetsGroup,
+		Version:    "v0.0.7",
+		Kind:       "Scaffolding",
+		Categories: []string{"krateo", "github"},
+		SpecSchema: specSchemaBytes,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	fmt.Println(string(yml))
 }
 
