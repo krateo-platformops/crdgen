@@ -98,6 +98,28 @@ func TestGenerateGithubScaffolding(t *testing.T) {
 	fmt.Println(string(yml))
 }
 
+func TestGenerateIssueCRD(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
+
+	specSchemaBytes, err := os.ReadFile("./testdata/test.chart.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	yml, err := crdgen.Generate(crdgen.Options{
+		Group:      "test.krateo.io",
+		Version:    "v0.0.7",
+		Kind:       "Testalo",
+		Categories: []string{"krateo"},
+		SpecSchema: specSchemaBytes,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(yml))
+}
+
 func TestIssueWrongCaseFields(t *testing.T) {
 	//os.Setenv("KEEP_CODE", "1")
 

@@ -1,0 +1,522 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "Chart NS Values Schema",
+    "description": "Schema for validating values.yaml for the chart-ns Helm chart",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "imageRegistry": {
+                    "type": "string",
+                    "description": "Global image registry to use for all images"
+                },
+                "imagePullSecrets": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Global image pull secrets"
+                }
+            }
+        },
+        "namespace": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create the namespace",
+                    "default": true
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the namespace (if empty, will use release namespace)"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Additional labels for the namespace"
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Additional annotations for the namespace"
+                }
+            },
+            "required": [
+                "create"
+            ]
+        },
+        "app": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Application name",
+                    "minLength": 1
+                },
+                "replicaCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of replicas"
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "Image repository",
+                            "minLength": 1
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "Image tag",
+                            "minLength": 1
+                        },
+                        "pullPolicy": {
+                            "type": "string",
+                            "enum": [
+                                "Always",
+                                "IfNotPresent",
+                                "Never"
+                            ],
+                            "description": "Image pull policy"
+                        }
+                    },
+                    "required": [
+                        "repository",
+                        "tag",
+                        "pullPolicy"
+                    ]
+                },
+                "service": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "ClusterIP",
+                                "NodePort",
+                                "LoadBalancer",
+                                "ExternalName"
+                            ],
+                            "description": "Service type"
+                        },
+                        "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535,
+                            "description": "Service port"
+                        },
+                        "targetPort": {
+                            "type": "string",
+                            "description": "Target port"
+                        },
+                        "additionalPorts": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "port": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 65535
+                                    },
+                                    "targetPort": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "port",
+                                    "targetPort"
+                                ]
+                            }
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "port",
+                        "targetPort"
+                    ]
+                },
+                "ingress": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Whether to create ingress"
+                        },
+                        "className": {
+                            "type": "string",
+                            "description": "Ingress class name"
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "hosts": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "host": {
+                                        "type": "string"
+                                    },
+                                    "paths": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "pathType": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Exact",
+                                                        "Prefix",
+                                                        "ImplementationSpecific"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "path",
+                                                "pathType"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "host",
+                                    "paths"
+                                ]
+                            }
+                        },
+                        "tls": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "secretName": {
+                                        "type": "string"
+                                    },
+                                    "hosts": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "enabled"
+                    ]
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "securityContext": {
+                    "type": "object",
+                    "description": "Security context for the container"
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Security context for the pod"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            },
+                            "valueFrom": {
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "name"
+                        ]
+                    }
+                },
+                "volumeMounts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "tolerations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "affinity": {
+                    "type": "object"
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "podLabels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "replicaCount",
+                "image",
+                "service",
+                "ingress"
+            ]
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create a service account"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the service account"
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "create"
+            ]
+        },
+        "rbac": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create RBAC resources"
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "clusterRole": {
+                    "type": "boolean",
+                    "description": "Whether to create a ClusterRole (true) or Role (false)"
+                }
+            },
+            "required": [
+                "create"
+            ]
+        },
+        "configMap": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create a config map"
+                },
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "create"
+            ]
+        },
+        "secret": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create a secret"
+                },
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "create"
+            ]
+        },
+        "monitoring": {
+            "type": "object",
+            "properties": {
+                "serviceMonitor": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "labels": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
+                        "interval": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "port": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "enabled"
+                    ]
+                }
+            }
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "minReplicas": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "maxReplicas": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "targetCPUUtilizationPercentage": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                },
+                "targetMemoryUtilizationPercentage": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                }
+            },
+            "required": [
+                "enabled"
+            ]
+        },
+        "podDisruptionBudget": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "minAvailable": {
+                    "type": "string"
+                },
+                "maxUnavailable": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "enabled"
+            ]
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "ingress": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "egress": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            },
+            "required": [
+                "enabled"
+            ]
+        }
+    },
+    "required": [
+        "namespace",
+        "app",
+        "serviceAccount"
+    ]
+}

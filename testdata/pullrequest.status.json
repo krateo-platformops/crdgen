@@ -1,0 +1,312 @@
+{
+  "properties": {
+    "closedBy": {
+      "properties": {
+        "_links": {
+          "description": "The class to represent a collection of REST reference links.",
+          "properties": {
+            "links": {
+              "description": "The readonly view of the links.  Because Reference links are readonly, we only want to expose them as read only.",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "descriptor": {
+          "description": "The descriptor is the primary way to reference the graph subject while the system is running. This field will uniquely identify the same graph subject across both Accounts and Organizations.",
+          "type": "string"
+        },
+        "directoryAlias": {
+          "description": "Deprecated - Can be retrieved by querying the Graph user referenced in the \"self\" entry of the IdentityRef \"_links\" dictionary",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "This is the non-unique display name of the graph subject. To change this field, you must alter its value in the source provider.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "description": "Deprecated - Available in the \"avatar\" entry of the IdentityRef \"_links\" dictionary",
+          "type": "string"
+        },
+        "inactive": {
+          "description": "Deprecated - Can be retrieved by querying the Graph membership state referenced in the \"membershipState\" entry of the GraphUser \"_links\" dictionary",
+          "type": "boolean"
+        },
+        "isAadIdentity": {
+          "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsAadUserType/Descriptor.IsAadGroupType)",
+          "type": "boolean"
+        },
+        "isContainer": {
+          "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsGroupType)",
+          "type": "boolean"
+        },
+        "isDeletedInOrigin": {
+          "type": "boolean"
+        },
+        "profileUrl": {
+          "description": "Deprecated - not in use in most preexisting implementations of ToIdentityRef",
+          "type": "string"
+        },
+        "uniqueName": {
+          "description": "Deprecated - use Domain+PrincipalName instead",
+          "type": "string"
+        },
+        "url": {
+          "description": "This url is the full route to the source resource of this graph subject.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "x-crdgen-identifier-name": "StatusClosedby"
+    },
+    "closedDate": {
+      "description": "The date when the pull request was closed (completed, abandoned, or merged externally). (format: date-time)",
+      "type": "string"
+    },
+    "createdBy": {
+      "properties": {
+        "_links": {
+          "description": "The class to represent a collection of REST reference links.",
+          "properties": {
+            "links": {
+              "description": "The readonly view of the links.  Because Reference links are readonly, we only want to expose them as read only.",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "descriptor": {
+          "description": "The descriptor is the primary way to reference the graph subject while the system is running. This field will uniquely identify the same graph subject across both Accounts and Organizations.",
+          "type": "string"
+        },
+        "directoryAlias": {
+          "description": "Deprecated - Can be retrieved by querying the Graph user referenced in the \"self\" entry of the IdentityRef \"_links\" dictionary",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "This is the non-unique display name of the graph subject. To change this field, you must alter its value in the source provider.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "description": "Deprecated - Available in the \"avatar\" entry of the IdentityRef \"_links\" dictionary",
+          "type": "string"
+        },
+        "inactive": {
+          "description": "Deprecated - Can be retrieved by querying the Graph membership state referenced in the \"membershipState\" entry of the GraphUser \"_links\" dictionary",
+          "type": "boolean"
+        },
+        "isAadIdentity": {
+          "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsAadUserType/Descriptor.IsAadGroupType)",
+          "type": "boolean"
+        },
+        "isContainer": {
+          "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsGroupType)",
+          "type": "boolean"
+        },
+        "isDeletedInOrigin": {
+          "type": "boolean"
+        },
+        "profileUrl": {
+          "description": "Deprecated - not in use in most preexisting implementations of ToIdentityRef",
+          "type": "string"
+        },
+        "uniqueName": {
+          "description": "Deprecated - use Domain+PrincipalName instead",
+          "type": "string"
+        },
+        "url": {
+          "description": "This url is the full route to the source resource of this graph subject.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "x-crdgen-identifier-name": "StatusCreatedby"
+    },
+    "creationDate": {
+      "description": "The date when the pull request was created. (format: date-time)",
+      "type": "string"
+    },
+    "isDraft": {
+      "description": "Draft / WIP pull request.",
+      "type": "boolean"
+    },
+    "labels": {
+      "description": "The labels associated with the pull request.",
+      "items": {
+        "description": "The representation of a tag definition which is sent across the wire.",
+        "properties": {
+          "active": {
+            "description": "Whether or not the tag definition is active.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "ID of the tag definition. (format: uuid)",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the tag definition.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Resource URL for the Tag Definition.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "mergeStatus": {
+      "description": "The current status of the pull request merge.",
+      "enum": [
+        "notSet",
+        "queued",
+        "conflicts",
+        "succeeded",
+        "rejectedByPolicy",
+        "failure"
+      ],
+      "type": "string"
+    },
+    "pullRequestId": {
+      "description": "The ID of the pull request. (format: int32)",
+      "type": "integer"
+    },
+    "remoteUrl": {
+      "description": "Used internally.",
+      "type": "string"
+    },
+    "reviewers": {
+      "description": "A list of reviewers on the pull request along with the state of their votes.",
+      "items": {
+        "description": "Identity information including a vote on a pull request.",
+        "properties": {
+          "_links": {
+            "description": "The class to represent a collection of REST reference links.",
+            "properties": {
+              "links": {
+                "description": "The readonly view of the links.  Because Reference links are readonly, we only want to expose them as read only.",
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "descriptor": {
+            "description": "The descriptor is the primary way to reference the graph subject while the system is running. This field will uniquely identify the same graph subject across both Accounts and Organizations.",
+            "type": "string"
+          },
+          "directoryAlias": {
+            "description": "Deprecated - Can be retrieved by querying the Graph user referenced in the \"self\" entry of the IdentityRef \"_links\" dictionary",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "This is the non-unique display name of the graph subject. To change this field, you must alter its value in the source provider.",
+            "type": "string"
+          },
+          "hasDeclined": {
+            "description": "Indicates if this reviewer has declined to review this pull request.",
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "description": "Deprecated - Available in the \"avatar\" entry of the IdentityRef \"_links\" dictionary",
+            "type": "string"
+          },
+          "inactive": {
+            "description": "Deprecated - Can be retrieved by querying the Graph membership state referenced in the \"membershipState\" entry of the GraphUser \"_links\" dictionary",
+            "type": "boolean"
+          },
+          "isAadIdentity": {
+            "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsAadUserType/Descriptor.IsAadGroupType)",
+            "type": "boolean"
+          },
+          "isContainer": {
+            "description": "Deprecated - Can be inferred from the subject type of the descriptor (Descriptor.IsGroupType)",
+            "type": "boolean"
+          },
+          "isDeletedInOrigin": {
+            "type": "boolean"
+          },
+          "isFlagged": {
+            "description": "Indicates if this reviewer is flagged for attention on this pull request.",
+            "type": "boolean"
+          },
+          "isReapprove": {
+            "description": "Indicates if this approve vote should still be handled even though vote didn't change.",
+            "type": "boolean"
+          },
+          "isRequired": {
+            "description": "Indicates if this is a required reviewer for this pull request. \u003cbr /\u003e Branches can have policies that require particular reviewers are required for pull requests.",
+            "type": "boolean"
+          },
+          "profileUrl": {
+            "description": "Deprecated - not in use in most preexisting implementations of ToIdentityRef",
+            "type": "string"
+          },
+          "reviewerUrl": {
+            "description": "URL to retrieve information about this identity",
+            "type": "string"
+          },
+          "uniqueName": {
+            "description": "Deprecated - use Domain+PrincipalName instead",
+            "type": "string"
+          },
+          "url": {
+            "description": "This url is the full route to the source resource of this graph subject.",
+            "type": "string"
+          },
+          "vote": {
+            "description": "Vote on a pull request:\u003cbr /\u003e 10 - approved 5 - approved with suggestions 0 - no vote -5 - waiting for author -10 - rejected (format: int16)",
+            "type": "integer"
+          },
+          "votedFor": {
+            "description": "Groups or teams that this reviewer contributed to. \u003cbr /\u003e Groups and teams can be reviewers on pull requests but can not vote directly.  When a member of the group or team votes, that vote is rolled up into the group or team vote.  VotedFor is a list of such votes.",
+            "items": {
+              "description": "Circular reference",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "sourceRefName": {
+      "description": "The name of the source branch of the pull request.",
+      "type": "string"
+    },
+    "status": {
+      "description": "The status of the pull request.",
+      "enum": [
+        "notSet",
+        "active",
+        "abandoned",
+        "completed",
+        "all"
+      ],
+      "type": "string"
+    },
+    "targetRefName": {
+      "description": "The name of the target branch of the pull request.",
+      "type": "string"
+    },
+    "title": {
+      "description": "The title of the pull request.",
+      "type": "string"
+    },
+    "url": {
+      "description": "Used internally.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

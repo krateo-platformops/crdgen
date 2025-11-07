@@ -102,9 +102,17 @@ func (t *TypeList) Equals(b TypeList) bool {
 }
 
 type AdditionalProperties struct {
-	IsBool bool  // flag per sapere se è un booleano
-	Bool   bool  // valore del booleano (true/false)
-	Type   *Type // se è uno schema
+	IsBool bool
+	Bool   bool
+	Type   *Type
+}
+
+func (ap *AdditionalProperties) IsTrue() bool {
+	if ap.IsBool {
+		return ap.Bool
+	}
+
+	return (ap.Type != nil)
 }
 
 func (ap *AdditionalProperties) UnmarshalJSON(data []byte) error {
@@ -142,27 +150,27 @@ type Type struct {
 	Version string `json:"$schema,omitempty"` // Section 6.1.
 	Ref     string `json:"$ref,omitempty"`    // Section 7.
 	// RFC draft-wright-json-schema-validation-00, section 5.
-	MultipleOf           *float64         `json:"multipleOf,omitempty"`           // Section 5.1.
-	Maximum              *float64         `json:"maximum,omitempty"`              // Section 5.2.
-	ExclusiveMaximum     *any             `json:"exclusiveMaximum,omitempty"`     // Section 5.3. Changed in draft 4.
-	Minimum              *float64         `json:"minimum,omitempty"`              // Section 5.4.
-	ExclusiveMinimum     *any             `json:"exclusiveMinimum,omitempty"`     // Section 5.5. Changed in draft 4.
-	MaxLength            int              `json:"maxLength,omitempty"`            // Section 5.6.
-	MinLength            int              `json:"minLength,omitempty"`            // Section 5.7.
-	Pattern              string           `json:"pattern,omitempty"`              // Section 5.8.
-	AdditionalItems      *Type            `json:"additionalItems,omitempty"`      // Section 5.9.
-	Items                *Type            `json:"items,omitempty"`                // Section 5.9.
-	MaxItems             int              `json:"maxItems,omitempty"`             // Section 5.10.
-	MinItems             int              `json:"minItems,omitempty"`             // Section 5.11.
-	UniqueItems          bool             `json:"uniqueItems,omitempty"`          // Section 5.12.
-	MaxProperties        int              `json:"maxProperties,omitempty"`        // Section 5.13.
-	MinProperties        int              `json:"minProperties,omitempty"`        // Section 5.14.
-	Required             []string         `json:"required,omitempty"`             // Section 5.15.
-	Properties           map[string]*Type `json:"properties,omitempty"`           // Section 5.16.
-	PatternProperties    map[string]*Type `json:"patternProperties,omitempty"`    // Section 5.17.
-	AdditionalProperties *bool            `json:"additionalProperties,omitempty"` // Section 5.18.
-	Enum                 []interface{}    `json:"enum,omitempty"`                 // Section 5.20.
-	Type                 TypeList         `json:"type,omitempty"`                 // Section 5.21.
+	MultipleOf           *float64              `json:"multipleOf,omitempty"`           // Section 5.1.
+	Maximum              *float64              `json:"maximum,omitempty"`              // Section 5.2.
+	ExclusiveMaximum     *any                  `json:"exclusiveMaximum,omitempty"`     // Section 5.3. Changed in draft 4.
+	Minimum              *float64              `json:"minimum,omitempty"`              // Section 5.4.
+	ExclusiveMinimum     *any                  `json:"exclusiveMinimum,omitempty"`     // Section 5.5. Changed in draft 4.
+	MaxLength            int                   `json:"maxLength,omitempty"`            // Section 5.6.
+	MinLength            int                   `json:"minLength,omitempty"`            // Section 5.7.
+	Pattern              string                `json:"pattern,omitempty"`              // Section 5.8.
+	AdditionalItems      *Type                 `json:"additionalItems,omitempty"`      // Section 5.9.
+	Items                *Type                 `json:"items,omitempty"`                // Section 5.9.
+	MaxItems             int                   `json:"maxItems,omitempty"`             // Section 5.10.
+	MinItems             int                   `json:"minItems,omitempty"`             // Section 5.11.
+	UniqueItems          bool                  `json:"uniqueItems,omitempty"`          // Section 5.12.
+	MaxProperties        int                   `json:"maxProperties,omitempty"`        // Section 5.13.
+	MinProperties        int                   `json:"minProperties,omitempty"`        // Section 5.14.
+	Required             []string              `json:"required,omitempty"`             // Section 5.15.
+	Properties           map[string]*Type      `json:"properties,omitempty"`           // Section 5.16.
+	PatternProperties    map[string]*Type      `json:"patternProperties,omitempty"`    // Section 5.17.
+	AdditionalProperties *AdditionalProperties `json:"additionalProperties,omitempty"` // Section 5.18.
+	Enum                 []interface{}         `json:"enum,omitempty"`                 // Section 5.20.
+	Type                 TypeList              `json:"type,omitempty"`                 // Section 5.21.
 	// RFC draft-bhutton-json-schema-01, section 10.
 	AllOf []*Type `json:"allOf,omitempty"` // Section 10.2.1.1.
 	AnyOf []*Type `json:"anyOf,omitempty"` // Section 10.2.1.2.
