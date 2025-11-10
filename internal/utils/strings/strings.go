@@ -93,6 +93,34 @@ func DefaultValForKubebuilder(def any) string {
 	}
 }
 
+func ExampleValForKubebuilder(ex any) string {
+	switch v := ex.(type) {
+	case []any:
+		strs := make([]string, len(v))
+		for i, item := range v {
+			strs[i] = fmt.Sprintf("%v", item)
+		}
+		return fmt.Sprintf("{%s}", `"`+strings.Join(strs, `","`)+`"`)
+	case []string:
+		return fmt.Sprintf("{%s}", `"`+strings.Join(v, `","`)+`"`)
+	case map[string]any:
+		keys := make([]string, 0, len(v))
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		parts := make([]string, len(keys))
+		for i, k := range keys {
+			parts[i] = fmt.Sprintf("%s: %v", k, formatMapValue(v[k]))
+		}
+		return fmt.Sprintf("{%s}", strings.Join(parts, ", "))
+	case string:
+		return fmt.Sprintf("%q", v)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
 func formatMapValue(v any) string {
 	switch val := v.(type) {
 	case string:

@@ -177,10 +177,11 @@ type Type struct {
 	OneOf []*Type `json:"oneOf,omitempty"` // Section 10.2.1.3.
 	Not   *Type   `json:"not,omitempty"`   // Section 10.2.1.4.
 	// RFC draft-wright-json-schema-validation-00, section 6, 7.
-	Title       string      `json:"title,omitempty"`       // Section 6.1.
-	Description string      `json:"description,omitempty"` // Section 6.1.
-	Default     interface{} `json:"default,omitempty"`     // Section 6.2.
-	Format      string      `json:"format,omitempty"`      // Section 7.
+	Title       string `json:"title,omitempty"`       // Section 6.1.
+	Description string `json:"description,omitempty"` // Section 6.1.
+	Default     any    `json:"default,omitempty"`     // Section 6.2.
+	Example     any    `json:"example,omitempty"`
+	Format      string `json:"format,omitempty"` // Section 7.
 	// RFC draft-wright-json-schema-hyperschema-00, section 4.
 	Media          *Type  `json:"media,omitempty"`          // Section 4.3.
 	BinaryEncoding string `json:"binaryEncoding,omitempty"` // Section 4.3.

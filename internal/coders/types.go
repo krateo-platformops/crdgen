@@ -317,6 +317,9 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		if prop.Default != nil {
 			st.AddLineComment("+kubebuilder:default:=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
 		}
+		if prop.Example != nil {
+			st.AddLineComment("+kubebuilder:example:=%s", stringsutils.ExampleValForKubebuilder(prop.Example))
+		}
 
 		if prop.Minimum != nil {
 			st.AddLineComment("+kubebuilder:validation:Minimum=%s",
@@ -332,6 +335,10 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		}
 		if prop.Pattern != "" {
 			st.AddLineComment("+kubebuilder:validation:Pattern=`%s`", prop.Pattern)
+		}
+
+		if prop.Format != "" {
+			st.AddLineComment("+kubebuilder:validation:Format=%s", prop.Format)
 		}
 
 		if prop.Type.Equals(schemas.TypeList{"string"}) && len(prop.Enum) > 0 {

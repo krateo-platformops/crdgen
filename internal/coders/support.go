@@ -212,12 +212,12 @@ func isRequired(schema *schemas.Type, key string) bool {
 }
 
 func mustPreserveUnknownFields(schema *schemas.Type) bool {
-	if schema == nil || schema.AdditionalProperties == nil {
+	if schema == nil {
 		return false
 	}
 
-	if schema.AdditionalProperties.IsTrue() {
-		return true
+	if schema.AdditionalItems != nil {
+		return schema.AdditionalProperties.IsTrue()
 	}
 
 	if schema.Type.Equals(schemas.TypeList{"object"}) &&

@@ -101,7 +101,51 @@ func TestGenerateGithubScaffolding(t *testing.T) {
 func TestGenerateIssueCRD(t *testing.T) {
 	//os.Setenv("KEEP_CODE", "1")
 
-	specSchemaBytes, err := os.ReadFile("./testdata/test.chart.schema.json")
+	specSchemaBytes, err := os.ReadFile("./testdata/object.with.preserve.unknown.fields.forced.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	yml, err := crdgen.Generate(crdgen.Options{
+		Group:      "test.krateo.io",
+		Version:    "v0.0.7",
+		Kind:       "Testalo",
+		Categories: []string{"krateo"},
+		SpecSchema: specSchemaBytes,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(yml))
+}
+
+func TestGenerateCRDWithExample(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
+
+	specSchemaBytes, err := os.ReadFile("./testdata/hello.example.schema.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	yml, err := crdgen.Generate(crdgen.Options{
+		Group:      "test.krateo.io",
+		Version:    "v0.0.7",
+		Kind:       "Testalo",
+		Categories: []string{"krateo"},
+		SpecSchema: specSchemaBytes,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(string(yml))
+}
+
+func TestGenerateCRDWithFormat(t *testing.T) {
+	//os.Setenv("KEEP_CODE", "1")
+
+	specSchemaBytes, err := os.ReadFile("./testdata/hello.format.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
