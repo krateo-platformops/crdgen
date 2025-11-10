@@ -11,27 +11,20 @@ import (
 	"github.com/krateoplatformops/crdgen/v2"
 )
 
-func TestGenerate(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
+func TestGenerateArrayEmums(t *testing.T) {
+	os.Setenv("KEEP_CODE", "1")
 
 	specSchemaBytes, err := os.ReadFile("./testdata/array.enums.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	statusSchemaBytes, err := os.ReadFile("./testdata/git.status.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	yml, err := crdgen.Generate(crdgen.Options{
-		Group:        "git.krateo.io",
-		Version:      "v1.2.3",
-		Kind:         "Repo",
-		Categories:   []string{"krateo", "git", "repo"},
-		SpecSchema:   specSchemaBytes,
-		StatusSchema: statusSchemaBytes,
-		Managed:      true,
+		Group:      "test.krateo.io",
+		Version:    "v0.0.7",
+		Kind:       "Test",
+		Categories: []string{"krateo", "test"},
+		SpecSchema: specSchemaBytes,
 	})
 	if err != nil {
 		t.Fatal(err)

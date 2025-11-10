@@ -341,9 +341,9 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 			st.AddLineComment("+kubebuilder:validation:Format=%s", prop.Format)
 		}
 
-		if prop.Type.Equals(schemas.TypeList{"string"}) && len(prop.Enum) > 0 {
-			st.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(prop.Enum, ";"))
-		}
+		// if prop.Type.Equals(schemas.TypeList{"string"}) && len(prop.Enum) > 0 {
+		// 	st.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(prop.Enum, ";"))
+		// }
 
 		if prop.Description != "" {
 			st.AddLineComment(prop.Description)
@@ -432,6 +432,9 @@ func (co *typesCoder) emitEnum(typeName string, t *schemas.Type) string {
 	co.generatedEnums[typeName] = true
 
 	grp := co.gen.NewGroup()
+	if len(t.Enum) > 0 {
+		grp.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(t.Enum, ";"))
+	}
 	grp.AddTypeAlias(typeName, "string")
 
 	consts := co.gen.NewGroup()
