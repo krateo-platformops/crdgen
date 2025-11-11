@@ -12,7 +12,7 @@ import (
 )
 
 func TestGenerateArrayEmums(t *testing.T) {
-	os.Setenv("KEEP_CODE", "1")
+	//os.Setenv("KEEP_CODE", "1")
 
 	specSchemaBytes, err := os.ReadFile("./testdata/array.enums.schema.json")
 	if err != nil {
@@ -34,7 +34,7 @@ func TestGenerateArrayEmums(t *testing.T) {
 }
 
 func TestGenerateButtonSchema(t *testing.T) {
-	os.Setenv("KEEP_CODE", "1")
+	//os.Setenv("KEEP_CODE", "1")
 
 	const (
 		widgetsGroup          = "widgets.templates.krateo.io"
@@ -58,10 +58,13 @@ func TestGenerateButtonSchema(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// f, _ := os.Create("vcluster.yaml")
+	// f, _ := os.Create("duezibidi.yaml")
 	// defer f.Close()
 
-	//io.Copy(f, strings.NewReader(string(yml)))
+	// _, err = io.Copy(f, strings.NewReader(string(yml)))
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 	fmt.Println(string(yml))
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 func RandomName(prefix string, rng *rand.Rand) string {
-	length := rng.Intn(maxLength - minLength + 1)
+	length := rng.Intn(maxLength-minLength+1) + minLength
 
 	gen := newNameGenerator(prefix, rng)
 	return gen.Rnd(length)
