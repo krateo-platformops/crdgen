@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
+	"math/rand"
 	"slices"
 	"strings"
+	"time"
 
 	gg "github.com/krateoplatformops/crdgen/v2/internal/codegen"
 	"github.com/krateoplatformops/crdgen/v2/internal/schemas"
@@ -19,6 +21,7 @@ func newTypesCoder() *typesCoder {
 		resolvedDefs:     map[string]*schemas.Type{},
 		generatedStructs: map[string]bool{},
 		generatedEnums:   map[string]bool{},
+		rng:              rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
@@ -29,6 +32,7 @@ type typesCoder struct {
 	resolvedDefs     map[string]*schemas.Type
 	generatedStructs map[string]bool
 	generatedEnums   map[string]bool
+	rng              *rand.Rand
 }
 
 func (co *typesCoder) bytes(gofmt bool) ([]byte, error) {
@@ -416,9 +420,12 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 
 	if t.Type.Equals(schemas.TypeList{"object"}) {
 		typeName = ptrutils.Deref(t.CrdgenIdentifierName, typeName)
-		if !co.generatedStructs[typeName] {
-			co.buildStruct(typeName, t, nil)
+		if co.generatedStructs[typeName] {
+			typeName = stringsutils.RandomName("Struct", co.rng)
 		}
+
+		co.buildStruct(typeName, t, nil)
+
 		return typeName
 	}
 
@@ -426,10 +433,10 @@ func (co *typesCoder) resolveType(typeName string, t *schemas.Type) string {
 }
 
 func (co *typesCoder) emitEnum(typeName string, t *schemas.Type) string {
+	typeName = ptrutils.Deref(t.CrdgenIdentifierName, typeName)
 	if co.generatedEnums[typeName] {
-		return typeName
+		typeName = stringsutils.RandomName("Enum", co.rng)
 	}
-	co.generatedEnums[typeName] = true
 
 	grp := co.gen.NewGroup()
 	if len(t.Enum) > 0 {
@@ -444,5 +451,8 @@ func (co *typesCoder) emitEnum(typeName string, t *schemas.Type) string {
 			consts.NewConst().AddTypedField(constName, typeName, gg.Lit(s))
 		}
 	}
+
+	co.generatedEnums[typeName] = true
+
 	return typeName
 }

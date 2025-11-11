@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-func RandomStructName(rng *rand.Rand) string {
+func RandomName(prefix string, rng *rand.Rand) string {
 	length := rng.Intn(maxLength - minLength + 1)
 
-	gen := newStructNameGenerator(rng)
+	gen := newNameGenerator(prefix, rng)
 	return gen.Rnd(length)
 }
 
@@ -30,25 +30,27 @@ var (
 	}
 )
 
-func newStructNameGenerator(rng *rand.Rand) *randomStructNameGenerator {
-	return &randomStructNameGenerator{
+func newNameGenerator(prefix string, rng *rand.Rand) *randomNameGenerator {
+	return &randomNameGenerator{
 		//rng: rand.New(rand.NewSource(time.Now().UnixNano())),
-		rng: rng,
+		rng:    rng,
+		prefix: prefix,
 	}
 }
 
-type randomStructNameGenerator struct {
-	rng *rand.Rand
+type randomNameGenerator struct {
+	rng    *rand.Rand
+	prefix string
 }
 
-func (r *randomStructNameGenerator) Rnd(length int) string {
+func (r *randomNameGenerator) Rnd(length int) string {
 	b := make([]byte, length)
 	b[0] = letters[rand.Intn(len(letters))]
 	for i := 1; i < length; i++ {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 
-	name := fmt.Sprintf("Struct_%s_%d", string(b), rand.Intn(100000))
+	name := fmt.Sprintf("%s_%s_%d", r.prefix, string(b), rand.Intn(100000))
 	name = strings.ReplaceAll(name, "-", "_")
 
 	if reservedKeywords[strings.ToLower(name)] {
