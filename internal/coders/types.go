@@ -301,14 +301,14 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		fieldName := exportedName(name)
 		fieldType := co.resolveType(fieldName, prop)
 
-		nullable := !isRequired(t, name)
-		if nullable && !strings.HasPrefix(fieldType, "*") && fieldType != "runtime.RawExtension" {
+		optional := !isRequired(t, name)
+		if optional && !strings.HasPrefix(fieldType, "*") && fieldType != "runtime.RawExtension" {
 			fieldType = "*" + fieldType
 		}
 
 		// tag json
 		tags := map[string]string{}
-		if nullable {
+		if optional {
 			tags["json"] = fmt.Sprintf("%s,omitempty", name)
 		} else {
 			tags["json"] = name
@@ -321,8 +321,8 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 		if prop.Default != nil {
 			st.AddLineComment("+kubebuilder:default:=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
 		}
-		if prop.Example != nil {
-			st.AddLineComment("+kubebuilder:example:=%s", stringsutils.ExampleValForKubebuilder(prop.Example))
+		if prop.Examples != nil {
+			st.AddLineComment("+kubebuilder:example:=%s", stringsutils.ExampleValForKubebuilder(prop.Examples))
 		}
 
 		if prop.Minimum != nil {
@@ -345,9 +345,9 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 			st.AddLineComment("+kubebuilder:validation:Format=%s", prop.Format)
 		}
 
-		// if prop.Type.Equals(schemas.TypeList{"string"}) && len(prop.Enum) > 0 {
-		// 	st.AddLineComment("+kubebuilder:validation:Enum:=" + stringsutils.Join(prop.Enum, ";"))
-		// }
+		if isNullable(prop) {
+			st.AddLineComment("+nullable")
+		}
 
 		if prop.Description != "" {
 			st.AddLineComment(prop.Description)

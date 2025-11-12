@@ -180,7 +180,7 @@ type Type struct {
 	Title       string `json:"title,omitempty"`       // Section 6.1.
 	Description string `json:"description,omitempty"` // Section 6.1.
 	Default     any    `json:"default,omitempty"`     // Section 6.2.
-	Example     any    `json:"example,omitempty"`
+	Examples    any    `json:"examples,omitempty"`
 	Format      string `json:"format,omitempty"` // Section 7.
 	// RFC draft-wright-json-schema-hyperschema-00, section 4.
 	Media          *Type  `json:"media,omitempty"`          // Section 4.3.

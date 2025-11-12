@@ -211,6 +211,14 @@ func isRequired(schema *schemas.Type, key string) bool {
 	return false
 }
 
+func isNullable(schema *schemas.Type) bool {
+	if schema == nil {
+		return false
+	}
+
+	return slices.Contains(schema.Type, "null")
+}
+
 func mustPreserveUnknownFields(schema *schemas.Type) bool {
 	if schema == nil {
 		return false

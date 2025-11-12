@@ -4,202 +4,60 @@
 package crdgen_test
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/krateoplatformops/crdgen/v2"
 )
 
-func TestGenerateArrayEmums(t *testing.T) {
+func TestGoldenFiles(t *testing.T) {
 	//os.Setenv("KEEP_CODE", "1")
-
-	specSchemaBytes, err := os.ReadFile("./testdata/array.enums.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "test.krateo.io",
-		Version:    "v0.0.7",
-		Kind:       "Test",
-		Categories: []string{"krateo", "test"},
-		SpecSchema: specSchemaBytes,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
-}
-
-func TestGenerateButtonSchema(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
 	const (
-		widgetsGroup          = "widgets.templates.krateo.io"
-		preserveUnknownFields = `{"type": "object", "additionalProperties": true,"x-kubernetes-preserve-unknown-fields": true}`
+		testDir       = "testdata"
+		defaultStatus = `{"type": "object", "additionalProperties": true,"x-kubernetes-preserve-unknown-fields": true}`
 	)
 
-	specSchemaBytes, err := os.ReadFile("./testdata/button.schema.json")
+	files, err := os.ReadDir(testDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:        widgetsGroup,
-		Version:      "v0.0.7",
-		Kind:         "Button",
-		Categories:   []string{"krateo", "widgets"},
-		SpecSchema:   specSchemaBytes,
-		StatusSchema: []byte(preserveUnknownFields),
-	})
-	if err != nil {
-		t.Fatal(err)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), ".schema.json") {
+			name := strings.TrimSuffix(f.Name(), ".schema.json")
+			t.Run(name, func(t *testing.T) {
+				schemaPath := filepath.Join(testDir, name+".schema.json")
+				crdExpectedPath := filepath.Join(testDir, name+".crd.yaml")
+
+				input, err := os.ReadFile(schemaPath)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				expected, err := os.ReadFile(crdExpectedPath)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				got, err := crdgen.Generate(crdgen.Options{
+					Group:        "test.krateo.io",
+					Version:      "v0.0.0",
+					Kind:         "Hello",
+					Categories:   []string{"krateo", "test", "hello"},
+					SpecSchema:   input,
+					StatusSchema: []byte(defaultStatus),
+				})
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if diff := cmp.Diff(string(expected), string(got)); diff != "" {
+					t.Errorf("CRD mismatch (-want +got):\n%s", diff)
+				}
+			})
+		}
 	}
-
-	// f, _ := os.Create("duezibidi.yaml")
-	// defer f.Close()
-
-	// _, err = io.Copy(f, strings.NewReader(string(yml)))
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	fmt.Println(string(yml))
-}
-
-func TestGenerateGithubScaffolding(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
-	const (
-		widgetsGroup = "github.krateo.io"
-	)
-
-	specSchemaBytes, err := os.ReadFile("./testdata/github-scaffolding.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      widgetsGroup,
-		Version:    "v0.0.7",
-		Kind:       "Scaffolding",
-		Categories: []string{"krateo", "github"},
-		SpecSchema: specSchemaBytes,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
-}
-
-func TestGenerateIssueCRD(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
-	specSchemaBytes, err := os.ReadFile("./testdata/object.with.preserve.unknown.fields.forced.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "test.krateo.io",
-		Version:    "v0.0.7",
-		Kind:       "Testalo",
-		Categories: []string{"krateo"},
-		SpecSchema: specSchemaBytes,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
-}
-
-func TestGenerateCRDWithExample(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
-	specSchemaBytes, err := os.ReadFile("./testdata/hello.example.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "test.krateo.io",
-		Version:    "v0.0.7",
-		Kind:       "Testalo",
-		Categories: []string{"krateo"},
-		SpecSchema: specSchemaBytes,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
-}
-
-func TestGenerateCRDWithFormat(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
-	specSchemaBytes, err := os.ReadFile("./testdata/hello.format.schema.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "test.krateo.io",
-		Version:    "v0.0.7",
-		Kind:       "Testalo",
-		Categories: []string{"krateo"},
-		SpecSchema: specSchemaBytes,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
-}
-
-func TestIssueWrongCaseFields(t *testing.T) {
-	//os.Setenv("KEEP_CODE", "1")
-
-	const (
-		js = `{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "properties": {
-      "greet-ing": {
-        "type": "string"
-      },
-      "dis_play": {
-        "type": "integer",
-        "default": 1
-      },
-      "verb--ose": {
-        "type": "boolean",
-        "default": false
-      },
-      "url": {
-        "type": "string",
-        "default": "https://github.com/krateoplatformops/sticz"
-      }
-    },
-    "required": [
-      "greeting"
-    ]
-  }`
-	)
-
-	yml, err := crdgen.Generate(crdgen.Options{
-		Group:      "krateo.io",
-		Version:    "v1alpha1",
-		Kind:       "Hello",
-		Categories: []string{"krateo", "hello"},
-		SpecSchema: []byte(js),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	fmt.Println(string(yml))
 }
