@@ -18,16 +18,20 @@ type Schema struct {
 	Definitions Definitions `json:"$defs,omitempty"`
 }
 
-// UnmarshalJSON implements json.Unmarshaler for Schema struct.
 func (s *Schema) UnmarshalJSON(data []byte) error {
-	var unmarshSchema unmarshalerSchema
-	if err := json.Unmarshal(data, &unmarshSchema); err != nil {
+	var tmp struct {
+		*ObjectAsType
+		ID          string      `json:"$id"`
+		LegacyID    string      `json:"id"`
+		Definitions Definitions `json:"$defs,omitempty"`
+	}
+
+	if err := json.Unmarshal(data, &tmp); err != nil {
 		return fmt.Errorf("failed to unmarshal schema: %w", err)
 	}
 
-	// Fall back to id if $id is not present.
-	if unmarshSchema.ID == "" {
-		unmarshSchema.ID = unmarshSchema.LegacyID
+	if tmp.ID == "" {
+		tmp.ID = tmp.LegacyID
 	}
 
 	// Take care of legacy fields.
@@ -39,18 +43,20 @@ func (s *Schema) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal schema: %w", err)
 	}
 
-	if unmarshSchema.Definitions == nil && legacySchema.Definitions != nil {
-		unmarshSchema.Definitions = legacySchema.Definitions
+	if tmp.Definitions == nil && legacySchema.Definitions != nil {
+		tmp.Definitions = legacySchema.Definitions
 	}
 
-	*s = Schema(unmarshSchema)
+	s.ObjectAsType = tmp.ObjectAsType
+	s.ID = tmp.ID
+	s.LegacyID = tmp.LegacyID
+	s.Definitions = tmp.Definitions
 
 	return nil
 }
 
 type (
-	unmarshalerSchema Schema
-	ObjectAsType      Type
+	ObjectAsType Type
 )
 
 // TypeList is a list of type names.
@@ -116,18 +122,24 @@ func (ap *AdditionalProperties) IsTrue() bool {
 }
 
 func (ap *AdditionalProperties) UnmarshalJSON(data []byte) error {
-	dataStr := string(data)
+	type AP AdditionalProperties // raw type, no methods
 
-	// Caso booleano: true/false
-	if dataStr == "true" || dataStr == "false" {
-		ap.IsBool = true
-		ap.Bool = dataStr == "true"
+	var tmp AP
+
+	var b bool
+	if err := json.Unmarshal(data, &b); err == nil {
+		tmp.IsBool = true
+		tmp.Bool = b
+		*ap = AdditionalProperties(tmp)
 		return nil
 	}
 
-	// Caso oggetto: schema JSON
-	ap.Type = &Type{}
-	return json.Unmarshal(data, ap.Type)
+	if err := json.Unmarshal(data, &tmp.Type); err != nil {
+		return err
+	}
+
+	*ap = AdditionalProperties(tmp)
+	return nil
 }
 
 // Definitions hold schema definitions.
@@ -247,8 +259,9 @@ func (value *Type) UnmarshalJSON(raw []byte) error {
 		return nil
 	}
 
-	var obj ObjectAsType
-	if err := json.Unmarshal(raw, &obj); err != nil {
+	type rawType Type
+	var tmp rawType
+	if err := json.Unmarshal(raw, &tmp); err != nil {
 		return fmt.Errorf("failed to unmarshal type: %w", err)
 	}
 
@@ -262,15 +275,15 @@ func (value *Type) UnmarshalJSON(raw []byte) error {
 		return fmt.Errorf("failed to unmarshal type: %w", err)
 	}
 
-	if legacyObj.Definitions != nil && obj.Definitions == nil {
-		obj.Definitions = legacyObj.Definitions
+	if legacyObj.Definitions != nil && tmp.Definitions == nil {
+		tmp.Definitions = legacyObj.Definitions
 	}
 
-	if legacyObj.Dependencies != nil && obj.DependentSchemas == nil {
-		obj.DependentSchemas = legacyObj.Dependencies
+	if legacyObj.Dependencies != nil && tmp.DependentSchemas == nil {
+		tmp.DependentSchemas = legacyObj.Dependencies
 	}
 
-	*value = Type(obj)
+	*value = Type(tmp)
 
 	return nil
 }

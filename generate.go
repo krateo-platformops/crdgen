@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"github.com/krateoplatformops/crdgen/v2"
+	"github.com/krateoplatformops/crdgen/v2/internal/coders"
 )
 
 func main() {
@@ -24,6 +25,8 @@ func main() {
 		testDir       = "testdata"
 		defaultStatus = `{"type": "object", "additionalProperties": true,"x-kubernetes-preserve-unknown-fields": true}`
 	)
+
+	keepCodeFor := ""
 
 	files, err := os.ReadDir(testDir)
 	if err != nil {
@@ -34,6 +37,12 @@ func main() {
 	for _, f := range files {
 		if !strings.HasSuffix(f.Name(), ".schema.json") {
 			continue
+		}
+
+		if keepCodeFor != "" && strings.HasPrefix(f.Name(), keepCodeFor) {
+			os.Setenv(coders.EnvKeepCode, "1")
+		} else {
+			os.Setenv(coders.EnvKeepCode, "0")
 		}
 
 		name := strings.TrimSuffix(f.Name(), ".schema.json")
@@ -81,5 +90,9 @@ func main() {
 		}
 
 		fmt.Printf("CRD %s generated successfully.\n", crdPath)
+
+		if strings.HasPrefix("preserve", f.Name()) {
+			os.Setenv("KEEP_CODE", "1")
+		}
 	}
 }

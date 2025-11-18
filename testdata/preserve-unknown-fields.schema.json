@@ -1,6 +1,7 @@
 {
   "title": "Hello Preserve Unknown Fields Example",
   "type": "object",
+  "additionalProperties": true,
   "properties": {
     "greeting": {
       "type": "string",

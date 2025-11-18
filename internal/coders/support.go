@@ -112,10 +112,8 @@ func deepCopyType(t *schemas.Type) *schemas.Type {
 	// copy AdditionalProperties
 	if t.AdditionalProperties != nil {
 		c.AdditionalProperties = &schemas.AdditionalProperties{}
-		if t.AdditionalProperties.IsBool {
-			c.AdditionalProperties.Bool = t.AdditionalProperties.Bool
-		}
-
+		c.AdditionalProperties.IsBool = t.AdditionalProperties.IsBool
+		c.AdditionalProperties.Bool = t.AdditionalProperties.Bool
 		c.AdditionalProperties.Type = deepCopyType(t.AdditionalProperties.Type)
 	}
 
@@ -224,13 +222,13 @@ func mustPreserveUnknownFields(schema *schemas.Type) bool {
 		return false
 	}
 
-	if schema.AdditionalItems != nil {
-		return schema.AdditionalProperties.IsTrue()
-	}
-
 	if schema.Type.Equals(schemas.TypeList{"object"}) &&
 		len(schema.Properties) == 0 {
 		return true
+	}
+
+	if schema.AdditionalProperties != nil {
+		return schema.AdditionalProperties.IsTrue()
 	}
 
 	return ptr.Deref(schema.PreserveUnknownFields, false)

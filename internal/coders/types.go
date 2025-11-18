@@ -125,11 +125,6 @@ func (co *typesCoder) buildStructForSpec(kind string) (err error) {
 
 	rootName := kind + "Spec"
 
-	if mustPreserveUnknownFields(rootType) {
-		grp := co.gen.NewGroup().AddLine()
-		grp.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
-	}
-
 	if len(rootType.Properties) > 0 {
 		err = co.buildStruct(rootName, rootType, nil)
 		if err != nil {
@@ -151,11 +146,6 @@ func (co *typesCoder) buildStructForStatus(kind string, managed bool) (err error
 	}
 
 	rootName := kind + "Status"
-
-	if mustPreserveUnknownFields(rootType) {
-		grp := co.gen.NewGroup().AddLine()
-		grp.AddLineComment("+kubebuilder:pruning:PreserveUnknownFields")
-	}
 
 	applyFn := []func(st *gg.IStruct){}
 	if managed {
@@ -316,7 +306,7 @@ func (co *typesCoder) buildStruct(typeName string, t *schemas.Type, applyFn ...f
 
 		// kubebuilder annotations
 		if prop.Title != "" {
-			st.AddLineComment("+kubebuilder:title:%s", prop.Title)
+			st.AddLineComment("+kubebuilder:title:=%s", prop.Title)
 		}
 		if prop.Default != nil {
 			st.AddLineComment("+kubebuilder:default:=%s", stringsutils.DefaultValForKubebuilder(prop.Default))
