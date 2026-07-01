@@ -63,3 +63,34 @@ func contains(s []string, e string) bool {
 	}
 	return false
 }
+
+// reservedTypeNames are Go identifiers that crdgen emits as package-level
+// declarations (constants, vars, funcs) in the generated apis package,
+// alongside the struct types produced from the JSON schema. A generated
+// struct type must never reuse one of these names or it would redeclare /
+// shadow the package-level identifier and break code generation.
+//
+// The canonical failure is a schema whose top-level property is named
+// "group" (e.g. the OpenStack Keystone group envelope): it yields
+// `type Group struct{...}` which collides with `const Group = "<api group>"`
+// emitted in groupversion_info.go.
+var reservedTypeNames = map[string]struct{}{
+	"Group":              {},
+	"Version":            {},
+	"SchemeGroupVersion": {},
+	"SchemeBuilder":      {},
+	"AddToScheme":        {},
+	"AddToSchemes":       {},
+}
+
+// safeTypeName returns a Go type name that does not collide with the
+// package-level identifiers emitted by crdgen. Colliding names are given an
+// "Envelope" suffix (e.g. "Group" -> "GroupEnvelope"), which is stable and
+// idempotent and avoids clashing with the <Kind>Spec/<Kind>Status/<Kind>List
+// types that crdgen also generates.
+func safeTypeName(name string) string {
+	if _, reserved := reservedTypeNames[name]; reserved {
+		return name + "Envelope"
+	}
+	return name
+}
