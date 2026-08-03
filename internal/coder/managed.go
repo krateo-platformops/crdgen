@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/dave/jennifer/jen"
-	"github.com/krateoplatformops/crdgen/internal/strutil"
+	"github.com/krateo-platformops/crdgen/internal/strutil"
 )
 
 func GenerateManaged(workdir string, res *Resource) error {

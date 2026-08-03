@@ -1,4 +1,4 @@
-module github.com/krateoplatformops/crdgen
+module github.com/krateo-platformops/crdgen
 
 go 1.25.0
 

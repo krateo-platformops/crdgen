@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/krateoplatformops/crdgen/internal/assets"
+	"github.com/krateo-platformops/crdgen/internal/assets"
 )
 
 func TestRender(t *testing.T) {

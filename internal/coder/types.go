@@ -11,9 +11,9 @@ import (
 	"github.com/dave/jennifer/jen"
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/krateoplatformops/crdgen/internal/ptr"
-	"github.com/krateoplatformops/crdgen/internal/strutil"
-	"github.com/krateoplatformops/crdgen/internal/transpiler"
+	"github.com/krateo-platformops/crdgen/internal/ptr"
+	"github.com/krateo-platformops/crdgen/internal/strutil"
+	"github.com/krateo-platformops/crdgen/internal/transpiler"
 )
 
 const (

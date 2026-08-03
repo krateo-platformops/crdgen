@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/krateoplatformops/crdgen/internal/ptr"
-	"github.com/krateoplatformops/crdgen/internal/transpiler"
-	"github.com/krateoplatformops/crdgen/internal/transpiler/jsonschema"
+	"github.com/krateo-platformops/crdgen/internal/ptr"
+	"github.com/krateo-platformops/crdgen/internal/transpiler"
+	"github.com/krateo-platformops/crdgen/internal/transpiler/jsonschema"
 )
 
 func TestArrayEnumFieldWithHelper(t *testing.T) {

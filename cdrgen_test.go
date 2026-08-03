@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/krateoplatformops/crdgen"
+	"github.com/krateo-platformops/crdgen"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

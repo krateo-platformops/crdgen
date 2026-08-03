@@ -13,8 +13,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/krateoplatformops/crdgen/internal/assets"
-	"github.com/krateoplatformops/crdgen/internal/coder"
+	"github.com/krateo-platformops/crdgen/internal/assets"
+	"github.com/krateo-platformops/crdgen/internal/coder"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

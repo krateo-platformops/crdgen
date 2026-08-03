@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/krateoplatformops/crdgen/internal/ptr"
-	"github.com/krateoplatformops/crdgen/internal/strutil"
-	"github.com/krateoplatformops/crdgen/internal/transpiler/jsonschema"
+	"github.com/krateo-platformops/crdgen/internal/ptr"
+	"github.com/krateo-platformops/crdgen/internal/strutil"
+	"github.com/krateo-platformops/crdgen/internal/transpiler/jsonschema"
 )
 
 // Field defines the data required to generate a field in Go.
