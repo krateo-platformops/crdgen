@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Values of the sample-app chart, exposed as the SampleApp composition spec.",
+  "properties": {
+    "replicas": {
+      "type": "integer",
+      "title": "Replica count",
+      "description": "Number of application replicas.",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 10
+    },
+    "image": {
+      "type": "object",
+      "description": "Container image coordinates.",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "default": "ghcr.io/krateo-platformops/sample-app"
+        },
+        "tag": {
+          "type": "string",
+          "default": "latest"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "default": "IfNotPresent"
+        }
+      },
+      "required": ["repository"]
+    },
+    "service": {
+      "type": "object",
+      "description": "Service exposure.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "port": {
+          "type": "integer",
+          "default": 8080
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "description": "Free-form extra annotations (typed map).",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Deployment tags.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["image"]
+}

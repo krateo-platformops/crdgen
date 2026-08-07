@@ -18,3 +18,9 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  lint-docs:
+    # THE canonical documentation-conformance check (the Krateo Documentation
+    # Standard): invariant core file set, OKF frontmatter, resolvable links,
+    # dead-org ban, examples pairing.
+    uses: krateo-platformops/.github/.github/workflows/lint-docs.yaml@main

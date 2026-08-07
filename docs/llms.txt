@@ -1,0 +1,20 @@
+# crdgen — LLM doc index (pinned: v0.6.0)
+# One line per file; regenerate the pin on release. Read files at the tag matching the
+# module version you consume (go get github.com/krateo-platformops/crdgen@v0.6.0).
+docs/index.md: the map — what the crdgen library is, its place in the composition-CRD lineage, links to the whole bundle
+docs/overview.md: the four-stage pipeline — JSON-Schema parse, transpile to Go structs, jennifer codegen with kubebuilder markers, go mod tidy + controller-gen exec; workdir lifecycle, digest, design trade-offs
+docs/usage.md: go get + the minimal Generate call, runtime prerequisites (Go toolchain on PATH, module proxy), chart-derived GVK convention, debugging failures
+docs/configuration.md: the whole config surface — Options fields, CRDGEN_CLEAN_WORKDIR, ambient Go-toolchain env inherited by the subprocesses
+docs/api.md: the exported Go API + the complete schema→CRD mapping rules of this library, and the production pipeline rules — int-or-string handling (explicit extension passthrough vs union normalization vs bare type-union) and the core-provider vacuum storage-version design (AppendVersion / RemoveStaleVersions)
+docs/examples.md: index of the runnable examples
+docs/release.md: tag-only release convention — vX.Y.Z tags via the Go module proxy, no OCI artifact; what CI runs; v0.6.0 as the module-identity floor
+docs/log.md: curated history v0.1.0 → v0.6.0 and where the lineage's active development moved
+examples/generate-crd/README.md: the canonical example — generate a composition CRD from a sample values.schema.json, go run .
+examples/generate-crd/main.go: the example source — fileJsonSchemaGetter + crdgen.Generate with Managed + chart-derived GVK
+examples/generate-crd/values.schema.json: the sample chart schema the example feeds in
+# Source (authoritative for every claim above):
+crdgen.go: the whole public API — Options, JsonSchemaGetter, Result, Generate, the toolchain exec and workdir lifecycle
+internal/transpiler/transpiler.go: JSON-Schema → Go struct/field model; the multiple-types hard error; additionalProperties collapse rules
+internal/transpiler/jsonschema/jsonschema.go: the draft-07 subset model, type-list handling, missing-type inference
+internal/coder/types.go: Go model → kubebuilder markers (defaults, validations, title, optional/required, printer columns)
+internal/assets/files/go.mod.tpl: the generated module's pinned toolchain deps (controller-tools, controller-runtime, apimachinery, provider-runtime)
