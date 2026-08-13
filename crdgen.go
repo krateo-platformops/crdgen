@@ -172,7 +172,7 @@ func Generate(ctx context.Context, opts Options) (res Result) {
 }
 
 func defaultCodeGeneratorOptions(rootDir string) (opts coder.Options, err error) {
-	opts.Module = fmt.Sprintf("github.com/krateoplatformops/%s", rootDir)
+	opts.Module = fmt.Sprintf("github.com/krateo-platformops/%s", rootDir)
 	opts.Workdir = filepath.Join(os.TempDir(), opts.Module)
 	err = os.MkdirAll(opts.Workdir, os.ModePerm)
 	if err != nil {

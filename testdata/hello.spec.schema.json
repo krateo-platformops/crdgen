@@ -15,7 +15,7 @@
       },
       "url": {
         "type": "string",
-        "default": "https://github.com/krateoplatformops/sticz"
+        "default": "https://github.com/krateo-platformops/sticz"
       }
     },
     "required": [
