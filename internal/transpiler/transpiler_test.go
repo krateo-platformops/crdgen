@@ -647,3 +647,87 @@ func contains(s []string, e string) bool {
 	}
 	return false
 }
+
+// TestReservedTypeNameCollision is a regression test for the bug where an
+// OpenAPI/JSON schema property named after an identifier that crdgen emits at
+// package scope (most notably `group`, which collides with the `Group`
+// constant generated in groupversion_info.go) produced an undefined Go type
+// and broke CRD generation with "unknown type Group".
+//
+// The generated struct type for such a property must be renamed so it no
+// longer collides, while the field name and JSON tag keep the original name.
+func TestReservedTypeNameCollision(t *testing.T) {
+	cases := []struct {
+		envelope   string // JSON property name (also the naive type name)
+		goName     string // expected Go field name (unchanged)
+		wantRename bool   // whether the generated type must be renamed
+	}{
+		{"group", "Group", true},
+		{"version", "Version", true},
+		{"project", "Project", false},
+		{"domain", "Domain", false},
+		{"user", "User", false},
+		{"role", "Role", false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.envelope, func(t *testing.T) {
+			root := jsonschema.Schema{
+				SchemaType: "http://json-schema.org/draft-04/schema#",
+				TypeValue:  "object",
+				Required:   []string{tc.envelope},
+				Properties: map[string]*jsonschema.Schema{
+					tc.envelope: {
+						TypeValue: "object",
+						Required:  []string{"name"},
+						Properties: map[string]*jsonschema.Schema{
+							"name":      {TypeValue: "string"},
+							"domain_id": {TypeValue: "string"},
+						},
+					},
+				},
+			}
+			root.Init()
+
+			structs, err := transpiler.Transpile(&root)
+			if err != nil {
+				t.Fatalf("transpile error: %v", err)
+			}
+
+			rootStruct, ok := structs["Root"]
+			if !ok {
+				t.Fatal("Root struct not found")
+			}
+
+			field, ok := rootStruct.Fields[tc.goName]
+			if !ok {
+				t.Fatalf("field %q not found; got %v", tc.goName, rootStruct.Fields)
+			}
+			if field.JSONName != tc.envelope {
+				t.Errorf("JSON name = %q, want %q", field.JSONName, tc.envelope)
+			}
+
+			// The field type must reference a struct that is actually defined.
+			bare := strings.TrimPrefix(field.Type, "*")
+			if _, defined := structs[bare]; !defined {
+				t.Fatalf("field type %q references an undefined struct; defined: %v", field.Type, structKeys(structs))
+			}
+
+			// Colliding names must be renamed away from the reserved identifier.
+			if tc.wantRename && bare == tc.goName {
+				t.Errorf("type %q was not renamed and collides with a reserved package-level identifier", bare)
+			}
+			if !tc.wantRename && bare != tc.goName {
+				t.Errorf("type = %q, want %q (should not be renamed)", bare, tc.goName)
+			}
+		})
+	}
+}
+
+func structKeys(m map[string]transpiler.Struct) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
+}

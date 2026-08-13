@@ -278,6 +278,17 @@ func (g *transpiler) processArray(name string, schema *jsonschema.Schema) (strin
 // schema: detail incl properties & child objects
 // returns: generated type
 func (g *transpiler) processObject(name string, schema *jsonschema.Schema) (typ string, err error) {
+	// A generated struct type lives in the same Go package as the
+	// package-level identifiers emitted by crdgen (e.g. the `Group` and
+	// `Version` constants in groupversion_info.go). If a schema property is
+	// named after one of those identifiers (the OpenStack Keystone `group`
+	// envelope is the canonical example) the resulting `type Group struct`
+	// collides with `const Group`, producing an "unknown type Group" error
+	// during CRD generation. Rename the *type* to a non-colliding name; the
+	// struct field keeps its original name/JSON tag because that is handled
+	// separately by the caller.
+	name = safeTypeName(name)
+
 	strct := Struct{
 		Name:        name,
 		Description: schema.Description,
