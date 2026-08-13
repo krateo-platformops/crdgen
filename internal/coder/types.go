@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	pkgCommon      = "github.com/krateoplatformops/provider-runtime/apis/common/v1"
+	pkgCommon      = "github.com/krateo-platformops/provider-runtime/apis/common/v1"
 	pkgCommonAlias = "rtv1"
 	pkgMeta        = "k8s.io/apimachinery/pkg/apis/meta/v1"
 	pkgMetaAlias   = "metav1"

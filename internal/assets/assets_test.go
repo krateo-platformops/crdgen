@@ -14,7 +14,7 @@ import (
 
 func TestRender(t *testing.T) {
 	ds := map[string]string{
-		"module": "github.com/krateoplatformops/form1",
+		"module": "github.com/krateo-platformops/form1",
 	}
 
 	err := assets.Render(os.Stdout, "go.mod", ds)
@@ -25,7 +25,7 @@ func TestRender(t *testing.T) {
 
 func TestExport(t *testing.T) {
 	ds := map[string]string{
-		"module": "github.com/krateoplatformops/form1",
+		"module": "github.com/krateo-platformops/form1",
 	}
 
 	buf := bytes.Buffer{}
@@ -34,7 +34,7 @@ func TestExport(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	targetDir := "/private/var/folders/qb/ckvcz6s10b590xt0b808977h0000gn/T/github.com/krateoplatformops/form1"
+	targetDir := "/private/var/folders/qb/ckvcz6s10b590xt0b808977h0000gn/T/github.com/krateo-platformops/form1"
 	target := filepath.Join(targetDir, "go.mod")
 	err = assets.Export(target, buf.Bytes())
 	if err != nil {

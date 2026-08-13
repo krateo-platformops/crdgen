@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	pkgResource      = "github.com/krateoplatformops/provider-runtime/pkg/resource"
+	pkgResource      = "github.com/krateo-platformops/provider-runtime/pkg/resource"
 	pkgResourceAlias = "resource"
 )
 
